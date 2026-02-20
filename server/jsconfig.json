@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "node",
+    "checkJs": false,
+    "noImplicitAny": false,
+    "allowJs": true
+  },
+  "exclude": ["node_modules"]
+}
