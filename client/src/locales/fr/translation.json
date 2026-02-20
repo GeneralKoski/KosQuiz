@@ -1,0 +1,58 @@
+{
+  "appName": "KosQuiz",
+  "landing": {
+    "title": "Bienvenue sur KosQuiz",
+    "subtitle": "Quiz multijoueur en temps réel",
+    "namePlaceholder": "Entrez votre nom",
+    "language": "Langue",
+    "createLobby": "Créer un Salon",
+    "joinLobby": "Rejoindre un Salon",
+    "lobbyCode": "Code du salon",
+    "codePlaceholder": "Entrez le code à 6 caractères",
+    "join": "Rejoindre",
+    "publicLobby": "Salon public",
+    "privateLobby": "Salon privé",
+    "publicLobbies": "Salons Publics",
+    "noPublicLobbies": "Aucun salon public disponible",
+    "players": "joueurs",
+    "hostedBy": "Hôte"
+  },
+  "lobby": {
+    "title": "Salon",
+    "code": "Code",
+    "waitingForPlayers": "En attente de joueurs...",
+    "players": "Joueurs",
+    "startGame": "Lancer la Partie",
+    "needMorePlayers": "Il faut au moins 2 joueurs",
+    "host": "Hôte",
+    "you": "Vous",
+    "copied": "Copié !"
+  },
+  "game": {
+    "round": "Manche",
+    "of": "sur",
+    "category": "Catégorie",
+    "points": "pts",
+    "yourTurn": "À vous !",
+    "turnOf": " doit répondre",
+    "answerPlaceholder": "Tapez votre réponse...",
+    "submit": "Envoyer",
+    "correct": "Correct !",
+    "wrong": "Faux !",
+    "timeUp": "Temps écoulé !",
+    "aiHint": "L'IA suggère...",
+    "correctAnswer": "La réponse était",
+    "leaderboard": "Classement",
+    "waiting": "En attente de",
+    "toAnswer": "..."
+  },
+  "end": {
+    "gameOver": "Partie Terminée !",
+    "winner": "Gagnant",
+    "finalScores": "Scores Finaux",
+    "playAgain": "Rejouer",
+    "backToLobby": "Retour au Salon",
+    "points": "points",
+    "tie": "Égalité !"
+  }
+}

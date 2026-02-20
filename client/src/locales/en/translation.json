@@ -1,0 +1,58 @@
+{
+  "appName": "KosQuiz",
+  "landing": {
+    "title": "Welcome to KosQuiz",
+    "subtitle": "Real-time multiplayer quiz game",
+    "namePlaceholder": "Enter your display name",
+    "language": "Language",
+    "createLobby": "Create Lobby",
+    "joinLobby": "Join Lobby",
+    "lobbyCode": "Lobby code",
+    "codePlaceholder": "Enter 6-character code",
+    "join": "Join",
+    "publicLobby": "Public lobby",
+    "privateLobby": "Private lobby",
+    "publicLobbies": "Public Lobbies",
+    "noPublicLobbies": "No public lobbies available",
+    "players": "players",
+    "hostedBy": "Host"
+  },
+  "lobby": {
+    "title": "Lobby",
+    "code": "Code",
+    "waitingForPlayers": "Waiting for players...",
+    "players": "Players",
+    "startGame": "Start Game",
+    "needMorePlayers": "Need at least 2 players",
+    "host": "Host",
+    "you": "You",
+    "copied": "Copied!"
+  },
+  "game": {
+    "round": "Round",
+    "of": "of",
+    "category": "Category",
+    "points": "pts",
+    "yourTurn": "Your turn!",
+    "turnOf": "'s turn",
+    "answerPlaceholder": "Type your answer...",
+    "submit": "Submit",
+    "correct": "Correct!",
+    "wrong": "Wrong!",
+    "timeUp": "Time's up!",
+    "aiHint": "AI Suggests...",
+    "correctAnswer": "The answer was",
+    "leaderboard": "Leaderboard",
+    "waiting": "Waiting for",
+    "toAnswer": "to answer..."
+  },
+  "end": {
+    "gameOver": "Game Over!",
+    "winner": "Winner",
+    "finalScores": "Final Scores",
+    "playAgain": "Play Again",
+    "backToLobby": "Back to Lobby",
+    "points": "points",
+    "tie": "It's a tie!"
+  }
+}
