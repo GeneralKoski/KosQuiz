@@ -5,6 +5,13 @@ import es from "./locales/es/translation.json";
 import fr from "./locales/fr/translation.json";
 import it from "./locales/it/translation.json";
 
+const supportedLngs = ["en", "it", "fr", "es"];
+
+function detectLanguage(): string {
+  const browserLang = navigator.language.split("-")[0];
+  return supportedLngs.includes(browserLang) ? browserLang : "en";
+}
+
 i18n.use(initReactI18next).init({
   resources: {
     en: { translation: en },
@@ -12,8 +19,8 @@ i18n.use(initReactI18next).init({
     fr: { translation: fr },
     es: { translation: es },
   },
-  lng: "it",
-  fallbackLng: "it",
+  lng: detectLanguage(),
+  fallbackLng: "en",
   interpolation: { escapeValue: false },
 });
 

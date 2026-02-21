@@ -1,3 +1,4 @@
+import { Users } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import EndScreen from "./components/EndScreen";
@@ -18,6 +19,7 @@ export default function App() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [endResults, setEndResults] = useState<GameEndResult | null>(null);
   const [initialLobbyError, setInitialLobbyError] = useState("");
+  const [gameError, setGameError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleLobbyUpdated = (data: LobbyInfo) => {
@@ -33,13 +35,18 @@ export default function App() {
       setScreen("lobby");
       setGameState(null);
       setEndResults(null);
+      setGameError(null);
     };
 
     const handleGameError = (data: { message: string }) => {
-      setInitialLobbyError(data.message);
-      setScreen("lobby");
-      setGameState(null);
-      setEndResults(null);
+      if (screen === "game") {
+        setGameError(data.message);
+      } else {
+        setInitialLobbyError(data.message);
+        setScreen("lobby");
+        setGameState(null);
+        setEndResults(null);
+      }
     };
 
     socket.on("lobby:updated", handleLobbyUpdated);
@@ -68,6 +75,13 @@ export default function App() {
 
   const handlePlayAgain = () => {
     socket.emit("game:playAgain");
+  };
+
+  const dismissGameError = () => {
+    setGameError(null);
+    setGameState(null);
+    setEndResults(null);
+    setScreen("lobby");
   };
 
   const returnToHome = () => {
@@ -103,7 +117,28 @@ export default function App() {
           />
         )}
         {screen === "game" && (
-          <Game gameState={gameState} onGameEnd={handleGameEnd} />
+          <>
+            <Game gameState={gameState} onGameEnd={handleGameEnd} />
+            {gameError && (
+              <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="bg-[#111] border border-white/10 rounded-3xl p-8 max-w-sm mx-4 text-center shadow-2xl">
+                  <div className="w-14 h-14 mx-auto mb-5 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                    <Users size={28} className="text-red-400" />
+                  </div>
+                  <p className="text-white text-lg font-bold mb-2">
+                    {t("end.gameOver")}
+                  </p>
+                  <p className="text-white/50 text-sm mb-6">{t(gameError)}</p>
+                  <button
+                    onClick={dismissGameError}
+                    className="bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-black px-8 py-3 rounded-xl font-bold uppercase tracking-widest text-sm transition-all hover:scale-[1.05] active:scale-95 cursor-pointer"
+                  >
+                    OK
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
         {screen === "end" && (
           <EndScreen results={endResults} onPlayAgain={handlePlayAgain} />

@@ -179,6 +179,9 @@ function emitGameState(lobby) {
         name: p.name,
         score: p.score,
       })),
+      timerRemaining: game.timerStartedAt
+        ? Math.max(0, game.timerSeconds - (Date.now() - game.timerStartedAt) / 1000)
+        : null,
     });
   }
 }
@@ -197,11 +200,16 @@ function clearTurnTimer(game) {
     clearTimeout(game.timer);
     game.timer = null;
   }
+  game.timerStartedAt = null;
+  game.timerSeconds = null;
 }
 
 function startTurnTimer(lobby) {
   const game = lobby.game;
   clearTurnTimer(game);
+
+  game.timerStartedAt = Date.now();
+  game.timerSeconds = 15;
 
   io.to(lobby.code).emit("game:timerStart", { seconds: 15 });
 
@@ -221,8 +229,8 @@ function advanceTurn(lobby) {
   if (answersInRotation >= totalPlayers) {
     handleRotationEnd(lobby);
   } else {
-    emitGameState(lobby);
     startTurnTimer(lobby);
+    emitGameState(lobby);
   }
 }
 
@@ -232,8 +240,8 @@ async function handleRotationEnd(lobby) {
 
   if (game.currentQuestion < 2) {
     game.currentQuestion++;
-    emitGameState(lobby);
     startTurnTimer(lobby);
+    emitGameState(lobby);
   } else {
     game.phase = "reveal";
     emitReveal(lobby);
@@ -265,8 +273,8 @@ function moveToNextRound(lobby) {
     game.phase = "question";
     game.answeredThisRotation = new Set();
     game.currentTurnIndex = game.currentRound % game.turnOrder.length;
-    emitGameState(lobby);
     startTurnTimer(lobby);
+    emitGameState(lobby);
   }
 }
 
@@ -425,8 +433,8 @@ io.on("connection", (socket) => {
     lobby.players.forEach((p) => (p.score = 0));
 
     cb?.({ ok: true });
-    emitGameState(lobby);
     startTurnTimer(lobby);
+    emitGameState(lobby);
     io.emit("lobbies:update", getPublicLobbies());
   });
 
@@ -469,10 +477,30 @@ io.on("connection", (socket) => {
     if (lobby.players.length === 0) {
       if (lobby.game) clearTurnTimer(lobby.game);
       lobbies.delete(lobby.code);
-    } else if (lobby.hostId === socket.id) {
-      lobby.hostId = lobby.players[0].id;
-      io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));
     } else {
+      if (lobby.hostId === socket.id) {
+        lobby.hostId = lobby.players[0].id;
+      }
+
+      if (lobby.state === "playing" && lobby.game) {
+        const game = lobby.game;
+        const wasActive = currentPlayerId(game) === socket.id;
+        game.turnOrder = game.turnOrder.filter((id) => id !== socket.id);
+
+        if (game.turnOrder.length < 2) {
+          lobby.state = "waiting";
+          clearTurnTimer(game);
+          lobby.game = null;
+          io.to(lobby.code).emit("game:error", {
+            message: "error.notEnoughPlayers",
+          });
+        } else if (wasActive) {
+          game.currentTurnIndex = game.currentTurnIndex % game.turnOrder.length;
+          startTurnTimer(lobby);
+          emitGameState(lobby);
+        }
+      }
+
       io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));
     }
     io.emit("lobbies:update", getPublicLobbies());
@@ -498,23 +526,20 @@ io.on("connection", (socket) => {
 
     if (lobby.state === "playing" && lobby.game) {
       const game = lobby.game;
+      const wasActive = currentPlayerId(game) === socket.id;
       game.turnOrder = game.turnOrder.filter((id) => id !== socket.id);
 
       if (game.turnOrder.length < 2) {
         lobby.state = "waiting";
-        lobby.game = null;
         clearTurnTimer(game);
+        lobby.game = null;
         io.to(lobby.code).emit("game:error", {
           message: "error.notEnoughPlayers",
         });
-        io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));
-      } else if (
-        currentPlayerId(game) === socket.id ||
-        !game.turnOrder.includes(currentPlayerId(game))
-      ) {
+      } else if (wasActive) {
         game.currentTurnIndex = game.currentTurnIndex % game.turnOrder.length;
-        emitGameState(lobby);
         startTurnTimer(lobby);
+        emitGameState(lobby);
       }
     }
 

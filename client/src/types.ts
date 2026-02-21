@@ -35,6 +35,7 @@ export interface GameState {
   phase: "question" | "hint" | "reveal" | "roundEnd" | "gameEnd";
   hintText: string | null;
   players: PlayerInfo[];
+  timerRemaining: number | null;
 }
 
 export interface GameEndResult {

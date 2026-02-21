@@ -37,24 +37,47 @@ export default function Game({ gameState, onGameEnd }: GameProps) {
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [revealAnswer, setRevealAnswer] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timerActiveRef = useRef(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const isMyTurn = gameState?.activePlayerId === socket.id;
 
+  const startCountdown = (seconds: number) => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerActiveRef.current = true;
+    setTimeLeft(seconds);
+    const start = Date.now();
+    timerRef.current = setInterval(() => {
+      const elapsed = (Date.now() - start) / 1000;
+      const remaining = Math.max(0, seconds - elapsed);
+      setTimeLeft(remaining);
+      if (remaining <= 0 && timerRef.current) {
+        clearInterval(timerRef.current);
+        timerActiveRef.current = false;
+      }
+    }, 50);
+  };
+
+  // Fallback: if Game mounts and the timer event was missed, start from gameState
   useEffect(() => {
-    const handleTimerStart = ({ seconds }: TimerStartData) => {
-      setTimeLeft(seconds);
+    if (
+      gameState?.timerRemaining != null &&
+      gameState.timerRemaining > 0 &&
+      !timerActiveRef.current
+    ) {
       setFeedback(null);
       setRevealAnswer(null);
       setAnswer("");
-      if (timerRef.current) clearInterval(timerRef.current);
-      const start = Date.now();
-      timerRef.current = setInterval(() => {
-        const elapsed = (Date.now() - start) / 1000;
-        const remaining = Math.max(0, seconds - elapsed);
-        setTimeLeft(remaining);
-        if (remaining <= 0 && timerRef.current) clearInterval(timerRef.current);
-      }, 50);
+      startCountdown(gameState.timerRemaining);
+    }
+  }, [gameState?.timerRemaining, gameState?.round, gameState?.questionIndex]);
+
+  useEffect(() => {
+    const handleTimerStart = ({ seconds }: TimerStartData) => {
+      setFeedback(null);
+      setRevealAnswer(null);
+      setAnswer("");
+      startCountdown(seconds);
     };
 
     const handleCorrect = ({
@@ -63,6 +86,7 @@ export default function Game({ gameState, onGameEnd }: GameProps) {
       answer: correctAns,
     }: CorrectFeedback) => {
       if (timerRef.current) clearInterval(timerRef.current);
+      timerActiveRef.current = false;
       setFeedback({ type: "correct", playerName, points, answer: correctAns });
     };
 
@@ -73,11 +97,13 @@ export default function Game({ gameState, onGameEnd }: GameProps) {
 
     const handleReveal = ({ correctAnswer }: RevealData) => {
       if (timerRef.current) clearInterval(timerRef.current);
+      timerActiveRef.current = false;
       setRevealAnswer(correctAnswer);
     };
 
     const handleEnd = (data: GameEndResult) => {
       if (timerRef.current) clearInterval(timerRef.current);
+      timerActiveRef.current = false;
       onGameEnd(data);
     };
 
@@ -89,6 +115,7 @@ export default function Game({ gameState, onGameEnd }: GameProps) {
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      timerActiveRef.current = false;
       socket.off("game:timerStart", handleTimerStart);
       socket.off("game:correct", handleCorrect);
       socket.off("game:wrong", handleWrong);
