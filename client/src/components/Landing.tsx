@@ -102,7 +102,7 @@ export default function Landing({ onJoinLobby }: LandingProps) {
         <div className="flex-1 w-full text-center md:text-left">
           <div className="mb-10">
             <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white mb-4 tracking-tight leading-none text-transparent bg-clip-text bg-gradient-to-br from-white to-white/50">
-              {t("landing.titlasde")}
+              {t("landing.title")}
             </h1>
             <p className="text-white/50 text-base md:text-lg tracking-wide max-w-sm mx-auto md:mx-0">
               {t("landing.subtitle")}
