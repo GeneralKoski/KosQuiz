@@ -19,7 +19,8 @@
     "emptyLeaderboard": "Nessun dato in classifica",
     "gamesPlayed": "partite",
     "gamesWon": "vinte",
-    "totalScore": "Punti Totali"
+    "totalScore": "Punti Totali",
+    "players": "Giocatori"
   },
   "lobby": {
     "title": "Lobby",

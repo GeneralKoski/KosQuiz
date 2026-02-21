@@ -19,7 +19,8 @@
     "emptyLeaderboard": "No leaderboard data yet",
     "gamesPlayed": "games",
     "gamesWon": "won",
-    "totalScore": "Total Points"
+    "totalScore": "Total Points",
+    "players": "Players"
   },
   "lobby": {
     "title": "Lobby",
