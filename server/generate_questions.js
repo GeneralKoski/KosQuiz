@@ -122,6 +122,7 @@ async function generateBatch(category) {
       ],
       model: "llama-3.1-8b-instant", // Modello più piccolo ed economico per i tokens
       temperature: 0.9,
+      max_tokens: 4000,
       response_format: { type: "json_object" },
     });
 
