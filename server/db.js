@@ -58,6 +58,18 @@ db.exec(`
     score INTEGER,
     won INTEGER DEFAULT 0
   );
+
+  -- Archivio domande
+  CREATE TABLE IF NOT EXISTS questions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    category TEXT,
+    question_json TEXT,
+    UNIQUE(question_json)
+  );
+
+  -- Indici per performance
+  CREATE INDEX IF NOT EXISTS idx_questions_category ON questions (category COLLATE NOCASE);
+  CREATE INDEX IF NOT EXISTS idx_game_results_token ON game_results (token);
 `);
 
 /**
@@ -141,6 +153,16 @@ const stmts = {
     ORDER BY total_score DESC
     LIMIT 50
   `),
+
+  insertQuestion: db.prepare(
+    "INSERT OR IGNORE INTO questions (category, question_json) VALUES (?, ?)",
+  ),
+  getRandomQuestions: db.prepare(
+    "SELECT question_json FROM questions WHERE LOWER(category) = LOWER(?) ORDER BY RANDOM() LIMIT ?",
+  ),
+  getAllRandomQuestions: db.prepare(
+    "SELECT question_json FROM questions ORDER BY RANDOM() LIMIT ?",
+  ),
 };
 
 export const dao = {
@@ -244,5 +266,19 @@ export const dao = {
 
   getLeaderboard() {
     return stmts.getLeaderboard.all();
+  },
+
+  insertQuestion(category, jsonBlob) {
+    return stmts.insertQuestion.run(category, jsonBlob);
+  },
+
+  getRandomQuestions(category, limit = 10) {
+    let rows;
+    if (category && category.toLowerCase() !== "random") {
+      rows = stmts.getRandomQuestions.all(category, limit);
+    } else {
+      rows = stmts.getAllRandomQuestions.all(limit);
+    }
+    return rows.map((r) => JSON.parse(r.question_json));
   },
 };

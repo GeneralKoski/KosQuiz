@@ -5,7 +5,6 @@ import Groq from "groq-sdk";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { dao } from "./db.js";
-import roundsDb from "./questions.js";
 
 const app = express();
 app.use(cors());
@@ -162,13 +161,20 @@ function lobbyInfo(lobby) {
 }
 
 function buildGameState(lobby, difficulty) {
-  let pool = roundsDb;
-  if (lobby.category && lobby.category !== "random") {
-    // try to match english name natively used as id
-    pool = roundsDb.filter(
-      (r) => r.category.en.toLowerCase() === lobby.category.toLowerCase(),
+  let pool = [];
+
+  try {
+    // Attempt to pull from the database first (supports dynamically generated ones)
+    const dbQuestions = dao.getRandomQuestions(lobby.category, 5);
+    pool = dbQuestions;
+  } catch (e) {
+    console.error("Error fetching questions from DB", e);
+  }
+
+  if (pool.length < 5) {
+    console.warn(
+      "Warning: Not enough questions in the database to build a full game.",
     );
-    if (pool.length < 5) pool = roundsDb; // fallback to all if a category doesn't have enough queries
   }
 
   const selectedRounds = shuffleArray(pool).slice(0, 5);
