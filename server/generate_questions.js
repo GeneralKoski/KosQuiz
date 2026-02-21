@@ -120,7 +120,7 @@ async function generateBatch(category) {
           content: PROMPT_TEMPLATE.replace("{category}", category),
         },
       ],
-      model: "llama-3.3-70b-versatile",
+      model: "llama3-8b-8192", // Modello più piccolo ed economico per i tokens
       temperature: 0.9,
     });
 
@@ -174,9 +174,9 @@ async function loop() {
     await generateBatch(cat);
     i++;
 
-    // Attendi 1 secondo tra le chiamate per non superare il rate limit e non esplodere
-    console.log("Waiting 1s...");
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Attendi 5 secondi tra le chiamate
+    console.log("Waiting 5s...");
+    await new Promise((resolve) => setTimeout(resolve, 5000));
   }
 }
 
