@@ -348,14 +348,20 @@ export default function Lobby({
                     <div className="flex items-center gap-3">
                       <div
                         className={`w-2.5 h-2.5 rounded-full ${
-                          p.id === socket.id
-                            ? "bg-[var(--accent-color)] shadow-[0_0_15px_var(--accent-color)] animate-pulse"
-                            : "bg-green-400"
+                          p.disconnected
+                            ? "bg-white/20"
+                            : p.id === socket.id
+                              ? "bg-[var(--accent-color)] shadow-[0_0_15px_var(--accent-color)] animate-pulse"
+                              : "bg-green-400"
                         }`}
                       />
                       <span
                         className={`font-semibold text-lg tracking-tight ${
-                          p.id === socket.id ? "text-white" : "text-white/70"
+                          p.disconnected
+                            ? "text-white/30 line-through"
+                            : p.id === socket.id
+                              ? "text-white"
+                              : "text-white/70"
                         }`}
                       >
                         {p.name}

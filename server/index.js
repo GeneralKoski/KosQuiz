@@ -17,6 +17,10 @@ const io = new Server(httpServer, {
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const lobbies = new Map();
+const tokens = new Map(); // token → { lobbyCode, playerName, disconnectTimer }
+const TOKEN_MAX_EVENTS = 30;
+const TOKEN_WINDOW_MS = 10_000;
+const REJOIN_GRACE_MS = 10_000;
 
 function generateCode() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -77,6 +81,7 @@ function lobbyInfo(lobby) {
       id: p.id,
       name: p.name,
       score: p.score,
+      disconnected: !!p.disconnected,
     })),
     state: lobby.state,
     difficulty: lobby.difficulty,
@@ -108,7 +113,7 @@ function buildGameState(lobby, difficulty) {
     difficulty, // 'turn' | 'easy' | 'medium' | 'hard'
     currentRound: 0,
     currentQuestion: 0, // 0..2 (turns/hints within a round)
-    turnOrder: lobby.players.map((p) => p.id),
+    turnOrder: lobby.players.filter((p) => !p.disconnected).map((p) => p.id),
     currentTurnIndex: 0,
     phase: "question",
     hintText: null,
@@ -178,9 +183,13 @@ function emitGameState(lobby) {
         id: p.id,
         name: p.name,
         score: p.score,
+        disconnected: !!p.disconnected,
       })),
       timerRemaining: game.timerStartedAt
-        ? Math.max(0, game.timerSeconds - (Date.now() - game.timerStartedAt) / 1000)
+        ? Math.max(
+            0,
+            game.timerSeconds - (Date.now() - game.timerStartedAt) / 1000,
+          )
         : null,
     });
   }
@@ -368,13 +377,31 @@ async function handleTurnEnd(lobby, answer) {
 }
 
 io.on("connection", (socket) => {
+  const token = socket.handshake.auth?.token || null;
   let currentLobbyCode = null;
+
+  // Rate limiting per socket
+  const rl = { count: 0, resetAt: Date.now() + TOKEN_WINDOW_MS };
+  socket.use((packet, next) => {
+    const now = Date.now();
+    if (now > rl.resetAt) {
+      rl.count = 0;
+      rl.resetAt = now + TOKEN_WINDOW_MS;
+    }
+    rl.count++;
+    if (rl.count > TOKEN_MAX_EVENTS) {
+      return next(new Error("rate_limit"));
+    }
+    next();
+  });
 
   socket.on("lobby:create", ({ name, lang, isPublic }, cb) => {
     if (!name || name.trim().length === 0)
       return cb?.({ error: "error.nameRequired" });
     const lobby = createLobby(socket, name.trim(), lang || "en", !!isPublic);
     currentLobbyCode = lobby.code;
+    if (token)
+      tokens.set(token, { lobbyCode: lobby.code, playerName: name.trim() });
     cb?.({ lobby: lobbyInfo(lobby) });
     io.emit("lobbies:update", getPublicLobbies());
   });
@@ -411,6 +438,11 @@ io.on("connection", (socket) => {
     });
     socket.join(code.toUpperCase());
     currentLobbyCode = code.toUpperCase();
+    if (token)
+      tokens.set(token, {
+        lobbyCode: currentLobbyCode,
+        playerName: name.trim(),
+      });
 
     cb?.({ lobby: lobbyInfo(lobby) });
     io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));
@@ -426,7 +458,9 @@ io.on("connection", (socket) => {
     const lobby = lobbies.get(currentLobbyCode);
     if (!lobby) return cb?.({ error: "error.lobbyNotFound" });
     if (lobby.hostId !== socket.id) return cb?.({ error: "error.notHost" });
-    if (lobby.players.length < 2) return cb?.({ error: "error.needPlayers" });
+    const connectedPlayers = lobby.players.filter((p) => !p.disconnected);
+    if (connectedPlayers.length < 2)
+      return cb?.({ error: "error.needPlayers" });
 
     lobby.state = "playing";
     lobby.game = buildGameState(lobby, difficulty);
@@ -472,6 +506,7 @@ io.on("connection", (socket) => {
 
     lobby.players = lobby.players.filter((p) => p.id !== socket.id);
     socket.leave(currentLobbyCode);
+    if (token) tokens.delete(token);
     currentLobbyCode = null;
 
     if (lobby.players.length === 0) {
@@ -506,28 +541,25 @@ io.on("connection", (socket) => {
     io.emit("lobbies:update", getPublicLobbies());
   });
 
-  socket.on("disconnect", () => {
-    if (!currentLobbyCode) return;
-    const lobby = lobbies.get(currentLobbyCode);
-    if (!lobby) return;
-
-    lobby.players = lobby.players.filter((p) => p.id !== socket.id);
+  // Fully remove a player (called on grace period expiry or if no token)
+  function removePlayer(lobby, playerId) {
+    lobby.players = lobby.players.filter((p) => p.id !== playerId);
 
     if (lobby.players.length === 0) {
       if (lobby.game) clearTurnTimer(lobby.game);
-      lobbies.delete(currentLobbyCode);
+      lobbies.delete(lobby.code);
       io.emit("lobbies:update", getPublicLobbies());
       return;
     }
 
-    if (lobby.hostId === socket.id) {
+    if (lobby.hostId === playerId) {
       lobby.hostId = lobby.players[0].id;
     }
 
     if (lobby.state === "playing" && lobby.game) {
       const game = lobby.game;
-      const wasActive = currentPlayerId(game) === socket.id;
-      game.turnOrder = game.turnOrder.filter((id) => id !== socket.id);
+      const wasActive = currentPlayerId(game) === playerId;
+      game.turnOrder = game.turnOrder.filter((id) => id !== playerId);
 
       if (game.turnOrder.length < 2) {
         lobby.state = "waiting";
@@ -545,6 +577,153 @@ io.on("connection", (socket) => {
 
     io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));
     io.emit("lobbies:update", getPublicLobbies());
+  }
+
+  socket.on("player:reconnect", (cb) => {
+    if (!token) return cb?.({ found: false });
+    const session = tokens.get(token);
+    if (!session || !session.lobbyCode) return cb?.({ found: false });
+
+    const lobby = lobbies.get(session.lobbyCode);
+    if (!lobby) {
+      tokens.delete(token);
+      return cb?.({ found: false });
+    }
+
+    // Find the disconnected player by name
+    const player = lobby.players.find(
+      (p) => p.name === session.playerName && p.disconnected,
+    );
+    if (!player) return cb?.({ found: false });
+
+    // Cancel grace period timer
+    if (session.disconnectTimer) {
+      clearTimeout(session.disconnectTimer);
+      session.disconnectTimer = null;
+    }
+
+    // Swap socket ID
+    const oldId = player.id;
+    player.id = socket.id;
+    player.disconnected = false;
+    currentLobbyCode = lobby.code;
+    socket.join(lobby.code);
+
+    // Update host if needed
+    if (lobby.hostId === oldId) {
+      lobby.hostId = socket.id;
+    }
+
+    // Update turnOrder if game is playing
+    if (lobby.state === "playing" && lobby.game) {
+      const game = lobby.game;
+      const idx = game.turnOrder.indexOf(oldId);
+      if (idx !== -1) {
+        game.turnOrder[idx] = socket.id;
+      } else {
+        // Was removed from turnOrder during grace period, add back
+        game.turnOrder.push(socket.id);
+      }
+
+      // Send game state to the reconnected player
+      const round = currentRound(game);
+      const question = currentQ(game);
+      const lang = player.lang || "en";
+      const activeId = currentPlayerId(game);
+      cb?.({
+        found: true,
+        screen: "game",
+        lobby: lobbyInfo(lobby),
+        gameState: {
+          round: game.currentRound + 1,
+          totalRounds: game.rounds.length,
+          category: round.category[lang] || round.category.en,
+          questionText: question.question[lang] || question.question.en,
+          questionPoints: question.points,
+          questionIndex: game.currentQuestion,
+          activePlayerId: activeId,
+          activePlayerName:
+            lobby.players.find((p) => p.id === activeId)?.name || "?",
+          phase: game.phase,
+          hintText:
+            game.currentQuestion >= 2 ? getCurrentHint(game, lang) : null,
+          players: lobby.players.map((p) => ({
+            id: p.id,
+            name: p.name,
+            score: p.score,
+            disconnected: !!p.disconnected,
+          })),
+          timerRemaining: game.timerStartedAt
+            ? Math.max(
+                0,
+                game.timerSeconds - (Date.now() - game.timerStartedAt) / 1000,
+              )
+            : null,
+        },
+      });
+    } else {
+      cb?.({
+        found: true,
+        screen: "lobby",
+        lobby: lobbyInfo(lobby),
+      });
+    }
+
+    io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));
+  });
+
+  socket.on("disconnect", () => {
+    if (!currentLobbyCode) return;
+    const lobby = lobbies.get(currentLobbyCode);
+    if (!lobby) return;
+
+    const playerId = socket.id;
+
+    // If player has a token, use grace period
+    if (token && tokens.has(token)) {
+      const player = lobby.players.find((p) => p.id === playerId);
+      if (player) {
+        player.disconnected = true;
+        const session = tokens.get(token);
+
+        // If game is playing, remove from turnOrder (re-added on rejoin)
+        if (lobby.state === "playing" && lobby.game) {
+          const game = lobby.game;
+          const wasActive = currentPlayerId(game) === playerId;
+          game.turnOrder = game.turnOrder.filter((id) => id !== playerId);
+
+          if (game.turnOrder.length > 0) {
+            if (wasActive) {
+              game.currentTurnIndex =
+                game.currentTurnIndex % game.turnOrder.length;
+              clearTurnTimer(game);
+              startTurnTimer(lobby);
+            }
+            emitGameState(lobby);
+          } else {
+            // All players disconnected, pause the game timer
+            clearTurnTimer(game);
+          }
+        }
+
+        io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));
+
+        // Start grace period
+        session.disconnectTimer = setTimeout(() => {
+          session.disconnectTimer = null;
+          tokens.delete(token);
+          const lobbyCheck = lobbies.get(session.lobbyCode);
+          if (lobbyCheck) {
+            removePlayer(lobbyCheck, playerId);
+          }
+        }, REJOIN_GRACE_MS);
+
+        return;
+      }
+    }
+
+    // No token or player not found — immediate removal
+    removePlayer(lobby, playerId);
   });
 });
 

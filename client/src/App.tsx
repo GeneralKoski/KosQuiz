@@ -21,6 +21,37 @@ export default function App() {
   const [initialLobbyError, setInitialLobbyError] = useState("");
   const [gameError, setGameError] = useState<string | null>(null);
 
+  // Auto-reconnect on socket connect (handles page refresh)
+  useEffect(() => {
+    const attemptReconnect = () => {
+      socket.emit(
+        "player:reconnect",
+        (res: {
+          found: boolean;
+          screen?: string;
+          lobby?: LobbyInfo;
+          gameState?: GameState;
+        }) => {
+          if (!res?.found) return;
+          setLobby(res.lobby!);
+          setPlayerName(localStorage.getItem("kosquiz_name") || "");
+          if (res.screen === "game" && res.gameState) {
+            setGameState(res.gameState);
+            setScreen("game");
+          } else {
+            setScreen("lobby");
+          }
+        },
+      );
+    };
+
+    if (socket.connected) attemptReconnect();
+    socket.on("connect", attemptReconnect);
+    return () => {
+      socket.off("connect", attemptReconnect);
+    };
+  }, []);
+
   useEffect(() => {
     const handleLobbyUpdated = (data: LobbyInfo) => {
       setLobby(data);

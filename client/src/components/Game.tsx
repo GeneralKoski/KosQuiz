@@ -325,9 +325,11 @@ export default function Game({ gameState, onGameEnd }: GameProps) {
                   animate={{ opacity: 1, x: 0 }}
                   key={p.id}
                   className={`flex items-center justify-between p-3 rounded-xl border transition-colors ${
-                    p.id === socket.id
-                      ? "bg-[var(--accent-color)]/10 border-[var(--accent-color)]/20"
-                      : "bg-white/5 border-transparent"
+                    p.disconnected
+                      ? "bg-white/5 border-transparent opacity-40"
+                      : p.id === socket.id
+                        ? "bg-[var(--accent-color)]/10 border-[var(--accent-color)]/20"
+                        : "bg-white/5 border-transparent"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -337,7 +339,7 @@ export default function Game({ gameState, onGameEnd }: GameProps) {
                       {i + 1}
                     </span>
                     <span
-                      className={`font-medium ${p.id === socket.id ? "text-[var(--accent-color)]" : "text-white/80"}`}
+                      className={`font-medium ${p.disconnected ? "text-white/40" : p.id === socket.id ? "text-[var(--accent-color)]" : "text-white/80"}`}
                     >
                       {p.name}
                     </span>

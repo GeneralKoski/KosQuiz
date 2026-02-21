@@ -11,7 +11,7 @@ interface LandingProps {
 
 export default function Landing({ onJoinLobby }: LandingProps) {
   const { t, i18n } = useTranslation();
-  const [name, setName] = useState("");
+  const [name, setName] = useState(() => localStorage.getItem("kosquiz_name") || "");
   const [code, setCode] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [publicLobbies, setPublicLobbies] = useState<PublicLobby[]>([]);
@@ -51,6 +51,7 @@ export default function Landing({ onJoinLobby }: LandingProps) {
           }
           return setErrors({ general: t(res.error) });
         }
+        localStorage.setItem("kosquiz_name", name.trim());
         onJoinLobby(res.lobby!, name.trim());
       },
     );
@@ -79,6 +80,7 @@ export default function Landing({ onJoinLobby }: LandingProps) {
           }
           return setErrors({ general: t(res.error) });
         }
+        localStorage.setItem("kosquiz_name", name.trim());
         onJoinLobby(res.lobby!, name.trim());
       },
     );

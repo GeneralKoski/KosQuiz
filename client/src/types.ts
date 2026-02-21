@@ -5,6 +5,7 @@ export interface PlayerInfo {
   id: string;
   name: string;
   score: number;
+  disconnected?: boolean;
 }
 
 export interface LobbyInfo {
