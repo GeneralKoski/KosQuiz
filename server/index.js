@@ -157,6 +157,7 @@ function lobbyInfo(lobby) {
     })),
     state: lobby.state,
     difficulty: lobby.difficulty,
+    category: lobby.category,
   };
 }
 
@@ -503,12 +504,14 @@ io.on("connection", (socket) => {
     io.emit("lobbies:update", getPublicLobbies());
   });
 
-  socket.on("lobby:updateSettings", ({ difficulty }) => {
+  socket.on("lobby:updateSettings", ({ difficulty, category }) => {
     if (!currentLobbyCode) return;
     const lobby = lobbies.get(currentLobbyCode);
     if (!lobby || lobby.hostId !== socket.id) return;
 
     if (difficulty) lobby.difficulty = difficulty;
+    if (category) lobby.category = category;
+
     dao.updateLobbySettings(lobby);
     io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));
   });
