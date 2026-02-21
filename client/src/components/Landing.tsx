@@ -15,7 +15,11 @@ export default function Landing({ onJoinLobby }: LandingProps) {
   const [code, setCode] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [publicLobbies, setPublicLobbies] = useState<PublicLobby[]>([]);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<{
+    name?: string;
+    code?: string;
+    general?: string;
+  }>({});
 
   // Controls what modal is shown
   const [view, setView] = useState<"list" | "create" | "join">("list");
@@ -35,13 +39,18 @@ export default function Landing({ onJoinLobby }: LandingProps) {
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return setError(t("error.nameRequired"));
-    setError("");
+    if (!name.trim()) return setErrors({ name: t("error.nameRequired") });
+    setErrors({});
     socket.emit(
       "lobby:create",
       { name: name.trim(), lang: i18n.language, isPublic },
       (res: { error?: string; lobby?: LobbyInfo }) => {
-        if (res.error) return setError(t(res.error));
+        if (res.error) {
+          if (res.error.toLowerCase().includes("name")) {
+            return setErrors({ name: t(res.error) });
+          }
+          return setErrors({ general: t(res.error) });
+        }
         onJoinLobby(res.lobby!, name.trim());
       },
     );
@@ -49,14 +58,27 @@ export default function Landing({ onJoinLobby }: LandingProps) {
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return setError(t("error.nameRequired"));
-    if (!code.trim()) return setError(t("error.lobbyNotFound"));
-    setError("");
+    const newErrors: any = {};
+    if (!name.trim()) newErrors.name = t("error.nameRequired");
+    if (!code.trim()) newErrors.code = t("error.lobbyNotFound");
+    if (Object.keys(newErrors).length > 0) return setErrors(newErrors);
+
+    setErrors({});
     socket.emit(
       "lobby:join",
       { name: name.trim(), lang: i18n.language, code: code.toUpperCase() },
       (res: { error?: string; lobby?: LobbyInfo }) => {
-        if (res.error) return setError(t(res.error));
+        if (res.error) {
+          if (res.error.toLowerCase().includes("name")) {
+            return setErrors({ name: t(res.error) });
+          } else if (
+            res.error.toLowerCase().includes("lobby") ||
+            res.error.toLowerCase().includes("game")
+          ) {
+            return setErrors({ code: t(res.error) });
+          }
+          return setErrors({ general: t(res.error) });
+        }
         onJoinLobby(res.lobby!, name.trim());
       },
     );
@@ -64,12 +86,12 @@ export default function Landing({ onJoinLobby }: LandingProps) {
 
   const openJoinModal = (lobbyCode?: string) => {
     if (lobbyCode) setCode(lobbyCode);
-    setError("");
+    setErrors({});
     setView("join");
   };
 
   const openCreateModal = () => {
-    setError("");
+    setErrors({});
     setView("create");
   };
 
@@ -185,13 +207,15 @@ export default function Landing({ onJoinLobby }: LandingProps) {
                   : t("landing.joinLobby")}
               </h2>
 
-              {error && (
+              {errors.general && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="w-full bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-4 rounded-2xl mb-6 text-center shadow-[0_0_15px_rgba(239,68,68,0.1)]"
                 >
-                  <span className="font-bold tracking-wide">{error}</span>
+                  <span className="font-bold tracking-wide">
+                    {errors.general}
+                  </span>
                 </motion.div>
               )}
 
@@ -203,12 +227,25 @@ export default function Landing({ onJoinLobby }: LandingProps) {
                   <input
                     type="text"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      if (errors.name)
+                        setErrors((prev) => ({ ...prev, name: undefined }));
+                    }}
                     placeholder="Es. Mario"
                     maxLength={15}
-                    className="w-full bg-[#111] border border-white/10 rounded-2xl px-5 py-4 text-white placeholder-white/30 text-base font-medium focus:outline-none focus:border-[var(--accent-color)] focus:ring-1 focus:ring-[var(--accent-color)] transition-all"
+                    className={`w-full bg-[#111] border ${errors.name ? "border-red-500/50 focus:border-red-400 focus:ring-red-400" : "border-white/10 focus:border-[var(--accent-color)] focus:ring-[var(--accent-color)]"} rounded-2xl px-5 py-4 text-white placeholder-white/30 text-base font-medium focus:outline-none focus:ring-1 transition-all`}
                     autoFocus
                   />
+                  {errors.name && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-red-400 text-sm font-bold mt-2 ml-2"
+                    >
+                      {errors.name}
+                    </motion.p>
+                  )}
                 </div>
 
                 {view === "join" && (
@@ -219,11 +256,24 @@ export default function Landing({ onJoinLobby }: LandingProps) {
                     <input
                       type="text"
                       value={code}
-                      onChange={(e) => setCode(e.target.value.toUpperCase())}
+                      onChange={(e) => {
+                        setCode(e.target.value.toUpperCase());
+                        if (errors.code)
+                          setErrors((prev) => ({ ...prev, code: undefined }));
+                      }}
                       placeholder={t("landing.codePlaceholder")}
                       maxLength={6}
-                      className="w-full bg-[#111] border border-white/10 rounded-2xl px-5 py-4 text-[var(--accent-color)] placeholder-white/20 text-xl font-black tracking-[0.3em] focus:outline-none focus:border-[var(--accent-color)] focus:ring-1 focus:ring-[var(--accent-color)] transition-all uppercase"
+                      className={`w-full bg-[#111] border ${errors.code ? "border-red-500/50 focus:border-red-400 focus:ring-red-400" : "border-white/10 focus:border-[var(--accent-color)] focus:ring-[var(--accent-color)]"} rounded-2xl px-5 py-4 text-[var(--accent-color)] placeholder-white/20 text-xl font-black tracking-[0.3em] focus:outline-none focus:ring-1 transition-all uppercase`}
                     />
+                    {errors.code && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-red-400 text-sm font-bold mt-2 ml-2"
+                      >
+                        {errors.code}
+                      </motion.p>
+                    )}
                   </div>
                 )}
 
