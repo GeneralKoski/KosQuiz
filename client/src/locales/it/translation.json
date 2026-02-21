@@ -14,8 +14,12 @@
     "privateLobby": "Lobby privata",
     "publicLobbies": "Lobby Pubbliche",
     "noPublicLobbies": "Nessuna lobby pubblica disponibile",
-    "players": "giocatori",
-    "hostedBy": "Host"
+    "hostedBy": "Host",
+    "leaderboard": "Classifica Globale",
+    "emptyLeaderboard": "Nessun dato in classifica",
+    "gamesPlayed": "partite",
+    "gamesWon": "vinte",
+    "totalScore": "Punti Totali"
   },
   "lobby": {
     "title": "Lobby",
@@ -75,6 +79,7 @@
     "notInLobby": "Non sei in una lobby",
     "notHost": "Solo l'host può avviare la partita",
     "needPlayers": "Servono almeno 2 giocatori",
-    "notEnoughPlayers": "Tutti gli altri giocatori hanno abbandonato la partita."
+    "notEnoughPlayers": "Tutti gli altri giocatori hanno abbandonato la partita.",
+    "alreadyInLobby": "Sei già in questa lobby"
   }
 }

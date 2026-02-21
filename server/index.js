@@ -4,6 +4,7 @@ import express from "express";
 import Groq from "groq-sdk";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { dao } from "./db.js";
 import roundsDb from "./questions.js";
 
 const app = express();
@@ -21,6 +22,71 @@ const tokens = new Map(); // token → { lobbyCode, playerName, disconnectTimer 
 const TOKEN_MAX_EVENTS = 30;
 const TOKEN_WINDOW_MS = 10_000;
 const REJOIN_GRACE_MS = 10_000;
+
+// -- Boot: restore da DB --
+const { lobbies: dbLobbies, tokens: dbTokens } = dao.loadAll();
+for (const dt of dbTokens) {
+  tokens.set(dt.token, {
+    lobbyCode: dt.lobby_code,
+    playerName: dt.player_name,
+    disconnectTimer: null,
+  });
+}
+for (const dl of dbLobbies) {
+  const l = dl.dbLobby;
+  const lobby = {
+    code: l.code,
+    isPublic: l.is_public === 1,
+    hostId: null,
+    players: dl.players.map((p) => ({
+      id: p.token, // temporary id until reconnect
+      token: p.token,
+      name: p.name,
+      lang: p.lang,
+      score: p.score,
+      disconnected: true,
+    })),
+    state: l.state,
+    difficulty: l.difficulty,
+    category: l.category,
+    game: dl.game,
+  };
+  lobby.hostId =
+    lobby.players.find((p) => p.token === l.host_token)?.id ||
+    lobby.players[0]?.id;
+
+  if (lobby.game && lobby.state === "playing") {
+    const g = lobby.game;
+    if (g.timerStartedAt && g.timerSeconds) {
+      const elapsed = Date.now() - g.timerStartedAt;
+      const remainingMs = g.timerSeconds * 1000 - elapsed;
+      if (remainingMs <= 0) {
+        setTimeout(() => handleTurnEnd(lobby, null), 100);
+      } else {
+        g.timerSeconds = remainingMs / 1000;
+        g.timerStartedAt = Date.now();
+        g.timer = setTimeout(() => {
+          if (!g.isCheckingAnswer) handleTurnEnd(lobby, null);
+        }, remainingMs);
+      }
+    }
+  }
+
+  if (lobby.players.length === 0) {
+    dao.deleteLobby(l.code);
+  } else {
+    lobbies.set(l.code, lobby);
+  }
+}
+
+// Clean up dead tokens
+for (const [t, data] of tokens) {
+  if (!lobbies.has(data.lobbyCode)) {
+    tokens.delete(t);
+    dao.leaveLobby(data.lobbyCode, t);
+  }
+}
+// -------------------------
 
 function generateCode() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -42,19 +108,26 @@ function shuffleArray(arr) {
   return a;
 }
 
-function createLobby(hostSocket, hostName, hostLang, isPublic) {
+function createLobby(hostSocket, hostName, hostLang, isPublic, token) {
   const code = generateCode();
   const lobby = {
     code,
     isPublic,
     hostId: hostSocket.id,
-    players: [{ id: hostSocket.id, name: hostName, lang: hostLang, score: 0 }],
+    players: [
+      { id: hostSocket.id, token, name: hostName, lang: hostLang, score: 0 },
+    ],
     state: "waiting",
     difficulty: "turn", // default
+    category: "random", // default
     game: null,
   };
   lobbies.set(code, lobby);
   hostSocket.join(code);
+  if (token) {
+    dao.createLobby(code, token, isPublic, "turn", "random", "waiting");
+    dao.joinLobby(code, token, hostName, hostLang, 0);
+  }
   return lobby;
 }
 
@@ -240,6 +313,7 @@ function advanceTurn(lobby) {
   } else {
     startTurnTimer(lobby);
     emitGameState(lobby);
+    dao.saveGameState(lobby.code, lobby.game);
   }
 }
 
@@ -251,10 +325,12 @@ async function handleRotationEnd(lobby) {
     game.currentQuestion++;
     startTurnTimer(lobby);
     emitGameState(lobby);
+    dao.saveGameState(lobby.code, game);
   } else {
     game.phase = "reveal";
     emitReveal(lobby);
     emitGameState(lobby);
+    dao.saveGameState(lobby.code, game);
 
     setTimeout(() => {
       moveToNextRound(lobby);
@@ -269,6 +345,11 @@ function moveToNextRound(lobby) {
   if (game.currentRound + 1 >= game.rounds.length) {
     game.phase = "gameEnd";
     lobby.state = "finished";
+
+    dao.deleteGameState(lobby.code);
+    dao.updateLobbyState(lobby.code, lobby.state);
+    dao.saveGameEnd(lobby);
+
     io.to(lobby.code).emit("game:end", {
       players: lobby.players.map((p) => ({
         id: p.id,
@@ -284,6 +365,7 @@ function moveToNextRound(lobby) {
     game.currentTurnIndex = game.currentRound % game.turnOrder.length;
     startTurnTimer(lobby);
     emitGameState(lobby);
+    dao.saveGameState(lobby.code, lobby.game);
   }
 }
 
@@ -355,6 +437,8 @@ async function handleTurnEnd(lobby, answer) {
 
     if (isCorrect) {
       player.score += q.points;
+      if (player.token)
+        dao.updatePlayerScore(lobby.code, player.token, player.score);
       io.to(lobby.code).emit("game:correct", {
         playerId: player.id,
         playerName: player.name,
@@ -398,10 +482,17 @@ io.on("connection", (socket) => {
   socket.on("lobby:create", ({ name, lang, isPublic }, cb) => {
     if (!name || name.trim().length === 0)
       return cb?.({ error: "error.nameRequired" });
-    const lobby = createLobby(socket, name.trim(), lang || "en", !!isPublic);
+    const lobby = createLobby(
+      socket,
+      name.trim(),
+      lang || "en",
+      !!isPublic,
+      token,
+    );
     currentLobbyCode = lobby.code;
-    if (token)
+    if (token) {
       tokens.set(token, { lobbyCode: lobby.code, playerName: name.trim() });
+    }
     cb?.({ lobby: lobbyInfo(lobby) });
     io.emit("lobbies:update", getPublicLobbies());
   });
@@ -412,6 +503,7 @@ io.on("connection", (socket) => {
     if (!lobby || lobby.hostId !== socket.id) return;
 
     if (difficulty) lobby.difficulty = difficulty;
+    dao.updateLobbySettings(lobby);
     io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));
   });
 
@@ -429,20 +521,26 @@ io.on("connection", (socket) => {
     ) {
       return cb?.({ error: "error.nameTaken" });
     }
+    if (token && lobby.players.some((p) => p.token === token)) {
+      return cb?.({ error: "error.alreadyInLobby" });
+    }
 
     lobby.players.push({
       id: socket.id,
+      token,
       name: name.trim(),
       lang: lang || "en",
       score: 0,
     });
     socket.join(code.toUpperCase());
     currentLobbyCode = code.toUpperCase();
-    if (token)
+    if (token) {
       tokens.set(token, {
         lobbyCode: currentLobbyCode,
         playerName: name.trim(),
       });
+      dao.joinLobby(currentLobbyCode, token, name.trim(), lang || "en", 0);
+    }
 
     cb?.({ lobby: lobbyInfo(lobby) });
     io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));
@@ -451,6 +549,16 @@ io.on("connection", (socket) => {
 
   socket.on("lobby:list", (cb) => {
     cb?.(getPublicLobbies());
+  });
+
+  socket.on("game:leaderboard", (cb) => {
+    try {
+      const data = dao.getLeaderboard();
+      cb?.({ leaderboard: data });
+    } catch (err) {
+      console.error("Error fetching leaderboard:", err);
+      cb?.({ error: "Failed to fetch leaderboard" });
+    }
   });
 
   socket.on("game:start", ({ difficulty = "turn" } = {}, cb) => {
@@ -464,7 +572,13 @@ io.on("connection", (socket) => {
 
     lobby.state = "playing";
     lobby.game = buildGameState(lobby, difficulty);
-    lobby.players.forEach((p) => (p.score = 0));
+    lobby.players.forEach((p) => {
+      p.score = 0;
+      if (p.token) dao.updatePlayerScore(lobby.code, p.token, 0);
+    });
+
+    dao.updateLobbyState(lobby.code, lobby.state);
+    dao.saveGameState(lobby.code, lobby.game);
 
     cb?.({ ok: true });
     startTurnTimer(lobby);
@@ -492,7 +606,13 @@ io.on("connection", (socket) => {
 
     lobby.state = "waiting";
     lobby.game = null;
-    lobby.players.forEach((p) => (p.score = 0));
+    lobby.players.forEach((p) => {
+      p.score = 0;
+      if (p.token) dao.updatePlayerScore(lobby.code, p.token, 0);
+    });
+
+    dao.updateLobbyState(lobby.code, lobby.state);
+    dao.deleteGameState(lobby.code);
 
     io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));
     io.to(lobby.code).emit("game:reset");
@@ -506,15 +626,20 @@ io.on("connection", (socket) => {
 
     lobby.players = lobby.players.filter((p) => p.id !== socket.id);
     socket.leave(currentLobbyCode);
-    if (token) tokens.delete(token);
+    if (token) {
+      tokens.delete(token);
+      dao.leaveLobby(currentLobbyCode, token);
+    }
     currentLobbyCode = null;
 
     if (lobby.players.length === 0) {
       if (lobby.game) clearTurnTimer(lobby.game);
       lobbies.delete(lobby.code);
+      dao.deleteLobby(lobby.code);
     } else {
       if (lobby.hostId === socket.id) {
         lobby.hostId = lobby.players[0].id;
+        dao.updateLobbySettings(lobby);
       }
 
       if (lobby.state === "playing" && lobby.game) {
@@ -526,6 +651,8 @@ io.on("connection", (socket) => {
           lobby.state = "waiting";
           clearTurnTimer(game);
           lobby.game = null;
+          dao.deleteGameState(lobby.code);
+          dao.updateLobbyState(lobby.code, lobby.state);
           io.to(lobby.code).emit("game:error", {
             message: "error.notEnoughPlayers",
           });
@@ -534,6 +661,7 @@ io.on("connection", (socket) => {
           startTurnTimer(lobby);
           emitGameState(lobby);
         }
+        if (lobby.game) dao.saveGameState(lobby.code, lobby.game);
       }
 
       io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));
@@ -543,17 +671,23 @@ io.on("connection", (socket) => {
 
   // Fully remove a player (called on grace period expiry or if no token)
   function removePlayer(lobby, playerId) {
+    const player = lobby.players.find((p) => p.id === playerId);
+    if (player && player.token) {
+      dao.leaveLobby(lobby.code, player.token);
+    }
     lobby.players = lobby.players.filter((p) => p.id !== playerId);
 
     if (lobby.players.length === 0) {
       if (lobby.game) clearTurnTimer(lobby.game);
       lobbies.delete(lobby.code);
+      dao.deleteLobby(lobby.code);
       io.emit("lobbies:update", getPublicLobbies());
       return;
     }
 
     if (lobby.hostId === playerId) {
       lobby.hostId = lobby.players[0].id;
+      dao.updateLobbySettings(lobby);
     }
 
     if (lobby.state === "playing" && lobby.game) {
@@ -565,6 +699,8 @@ io.on("connection", (socket) => {
         lobby.state = "waiting";
         clearTurnTimer(game);
         lobby.game = null;
+        dao.deleteGameState(lobby.code);
+        dao.updateLobbyState(lobby.code, lobby.state);
         io.to(lobby.code).emit("game:error", {
           message: "error.notEnoughPlayers",
         });
@@ -573,6 +709,7 @@ io.on("connection", (socket) => {
         startTurnTimer(lobby);
         emitGameState(lobby);
       }
+      if (lobby.game) dao.saveGameState(lobby.code, lobby.game);
     }
 
     io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));

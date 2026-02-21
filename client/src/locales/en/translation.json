@@ -14,8 +14,12 @@
     "privateLobby": "Private lobby",
     "publicLobbies": "Public Lobbies",
     "noPublicLobbies": "No public lobbies available",
-    "players": "players",
-    "hostedBy": "Host"
+    "hostedBy": "Host",
+    "leaderboard": "Global Leaderboard",
+    "emptyLeaderboard": "No leaderboard data yet",
+    "gamesPlayed": "games",
+    "gamesWon": "won",
+    "totalScore": "Total Points"
   },
   "lobby": {
     "title": "Lobby",
@@ -75,6 +79,7 @@
     "notInLobby": "You are not in a lobby",
     "notHost": "Only the host can start",
     "needPlayers": "Need at least 2 players",
-    "notEnoughPlayers": "All other players have left the game."
+    "notEnoughPlayers": "All other players have left the game.",
+    "alreadyInLobby": "You are already in this lobby"
   }
 }

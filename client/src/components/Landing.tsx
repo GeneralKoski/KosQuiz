@@ -1,9 +1,10 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Play, Plus, Search, Users, X } from "lucide-react";
+import { Play, Plus, Search, Trophy, Users, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import socket from "../socket";
 import type { LobbyInfo, PublicLobby } from "../types";
+import Leaderboard from "./Leaderboard";
 
 interface LandingProps {
   onJoinLobby: (lobby: LobbyInfo, name: string) => void;
@@ -11,7 +12,9 @@ interface LandingProps {
 
 export default function Landing({ onJoinLobby }: LandingProps) {
   const { t, i18n } = useTranslation();
-  const [name, setName] = useState(() => localStorage.getItem("kosquiz_name") || "");
+  const [name, setName] = useState(
+    () => localStorage.getItem("kosquiz_name") || "",
+  );
   const [code, setCode] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [publicLobbies, setPublicLobbies] = useState<PublicLobby[]>([]);
@@ -22,7 +25,9 @@ export default function Landing({ onJoinLobby }: LandingProps) {
   }>({});
 
   // Controls what modal is shown
-  const [view, setView] = useState<"list" | "create" | "join">("list");
+  const [view, setView] = useState<"list" | "create" | "join" | "leaderboard">(
+    "list",
+  );
 
   useEffect(() => {
     socket.emit("lobby:list", (lobbies: PublicLobby[]) => {
@@ -127,6 +132,17 @@ export default function Landing({ onJoinLobby }: LandingProps) {
               <span className="text-lg">{t("landing.joinLobby")}</span>
             </button>
           </div>
+
+          <button
+            onClick={() => {
+              setErrors({});
+              setView("leaderboard");
+            }}
+            className="w-full sm:w-auto bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-500 font-bold py-4 px-8 rounded-2xl flex items-center justify-center gap-2 transition-all hover:scale-105 cursor-pointer"
+          >
+            <Trophy size={24} />
+            <span className="text-lg">{t("landing.leaderboard")}</span>
+          </button>
         </div>
 
         {/* Colonna di destra: Lobbies */}
@@ -188,7 +204,10 @@ export default function Landing({ onJoinLobby }: LandingProps) {
       </div>
 
       <AnimatePresence>
-        {view !== "list" && (
+        {view === "leaderboard" && (
+          <Leaderboard onClose={() => setView("list")} />
+        )}
+        {(view === "create" || view === "join") && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
