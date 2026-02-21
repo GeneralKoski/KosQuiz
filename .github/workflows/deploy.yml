@@ -1,0 +1,29 @@
+name: Deploy KosQuiz
+
+on:
+  push:
+    branches: [ main ] # Si attiva quando fai push su main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /srv/apps/quiz-project
+            git pull origin main
+            
+            # Backend
+            cd server
+            npm install
+            pm2 restart kosquiz-backend || pm2 start index.js --name kosquiz-backend
+            
+            # Frontend
+            cd ../client
+            npm install
+            npm run build
