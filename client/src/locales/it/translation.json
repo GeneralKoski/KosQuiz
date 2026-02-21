@@ -20,6 +20,10 @@
   "lobby": {
     "title": "Lobby",
     "code": "Codice",
+    "settings": "Impostazioni Partita",
+    "onlyHostDesc": "Solo l'host può modificare",
+    "categoryDesc": "Categoria",
+    "difficultyDesc": "Difficoltà",
     "waitingForPlayers": "In attesa di giocatori...",
     "players": "Giocatori",
     "catRandom": "Mix Casuale",
@@ -37,7 +41,9 @@
     "round": "Round",
     "of": "di",
     "category": "Categoria",
+    "questionBadge": "Domanda",
     "points": "pti",
+    "guessedIt": "ha indovinato! (+{{points}} pti)",
     "yourTurn": "Tocca a te!",
     "turnOf": " deve rispondere",
     "answerPlaceholder": "Scrivi la tua risposta...",
@@ -57,6 +63,7 @@
     "finalScores": "Punteggi Finali",
     "playAgain": "Gioca Ancora",
     "backToLobby": "Torna alla Lobby",
+    "exit": "Esci",
     "points": "punti",
     "tie": "Pareggio!"
   },

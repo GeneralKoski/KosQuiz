@@ -17,6 +17,7 @@ export default function App() {
   const [playerName, setPlayerName] = useState("");
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [endResults, setEndResults] = useState<GameEndResult | null>(null);
+  const [initialLobbyError, setInitialLobbyError] = useState("");
 
   useEffect(() => {
     const handleLobbyUpdated = (data: LobbyInfo) => {
@@ -34,7 +35,8 @@ export default function App() {
       setEndResults(null);
     };
 
-    const handleGameError = () => {
+    const handleGameError = (data: { message: string }) => {
+      setInitialLobbyError(data.message);
       setScreen("lobby");
       setGameState(null);
       setEndResults(null);
@@ -93,7 +95,12 @@ export default function App() {
       <main className="flex-1 flex items-center justify-center py-8">
         {screen === "landing" && <Landing onJoinLobby={handleJoinLobby} />}
         {screen === "lobby" && lobby && (
-          <Lobby lobby={lobby} playerName={playerName} />
+          <Lobby
+            lobby={lobby}
+            playerName={playerName}
+            initialError={initialLobbyError}
+            onClearError={() => setInitialLobbyError("")}
+          />
         )}
         {screen === "game" && (
           <Game gameState={gameState} onGameEnd={handleGameEnd} />

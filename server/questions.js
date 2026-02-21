@@ -1,472 +1,1962 @@
 export default [
   {
-    category: {
-      en: "Geography",
-      it: "Geografia",
-      fr: "Géographie",
-      es: "Geografía",
+    "category": {
+      "en": "Geography",
+      "it": "Geografia"
     },
-    answer: { en: "Paris", it: "Parigi", fr: "Paris", es: "París" },
-    hard: {
-      points: 3,
-      question: {
-        en: "This European capital sits on the Seine river and is known as the City of Light.",
-        it: "Questa capitale europea si trova sulla Senna ed è conosciuta come la Città della Luce.",
-        fr: "Cette capitale européenne se trouve sur la Seine et est connue comme la Ville Lumière.",
-        es: "Esta capital europea se encuentra a orillas del Sena y es conocida como la Ciudad de la Luz.",
+    "answer": {
+      "en": "Rome",
+      "it": "Roma"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Capital of the Roman Empire",
+        "it": "Capitale dell'Impero Romano"
       },
-      hints: [
+      "hints": [
         {
-          en: "Famous for its Gothic cathedral, Notre-Dame.",
-          it: "Famosa per la sua cattedrale gotica, Notre-Dame.",
-          fr: "Célèbre pour sa cathédrale gothique, Notre-Dame.",
-          es: "Famosa por su catedral gótica, Notre-Dame.",
-        },
-        {
-          en: "It has an iconic arched monument on the Champs-Élysées.",
-          it: "Ha un iconico monumento ad arco sugli Champs-Élysées.",
-          fr: "Il possède un monument en arc emblématique sur les Champs-Élysées.",
-          es: "Tiene un icónico monumento arqueado en los Campos Elíseos.",
-        },
-        {
-          en: "Its most viewed museum is the Louvre.",
-          it: "Il suo museo più visitato è il Louvre.",
-          fr: "Son musée le plus visité est le Louvre.",
-          es: "Su museo más visitado es el Louvre.",
-        },
-      ],
+          "en": "In Italy",
+          "it": "In Italia"
+        }
+      ]
     },
-    medium: {
-      points: 2,
-      question: {
-        en: "This city's most famous landmark is an iron lattice tower built in 1889.",
-        it: "Il monumento più famoso di questa città è una torre di ferro costruita nel 1889.",
-        fr: "Le monument le plus célèbre de cette ville est une tour en fer construite en 1889.",
-        es: "El monumento más famoso de esta ciudad es una torre de hierro construida en 1889.",
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Has the Colosseum",
+        "it": "Ha il Colosseo"
       },
-      hints: [
+      "hints": [
         {
-          en: "The tower is named after Gustave Eiffel.",
-          it: "La torre prende il nome da Gustave Eiffel.",
-          fr: "La tour porte le nom de Gustave Eiffel.",
-          es: "La torre lleva el nombre de Gustave Eiffel.",
-        },
-        {
-          en: "It's the capital of a hexagon-shaped country.",
-          it: "E' la capitale di un paese a forma di esagono.",
-          fr: "C'est la capitale d'un pays en forme d'hexagone.",
-          es: "Es la capital de un país con forma de hexágono.",
-        },
-        {
-          en: "It hosted the 2024 Summer Olympics.",
-          it: "Ha ospitato le Olimpiadi estive del 2024.",
-          fr: "Il a accueilli les Jeux olympiques d'été de 2024.",
-          es: "Acogió los Juegos Olímpicos de verano de 2024.",
-        },
-      ],
+          "en": "Eternal city",
+          "it": "Città eterna"
+        }
+      ]
     },
-    easy: {
-      points: 1,
-      question: {
-        en: "Name the capital of France.",
-        it: "Qual è la capitale della Francia?",
-        fr: "Quelle est la capitale de la France ?",
-        es: "¿Cuál es la capital de Francia?",
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Capital of Italy",
+        "it": "Capitale d'Italia"
       },
-      hints: [
+      "hints": [
         {
-          en: "Starts with the letter P.",
-          it: "Inizia con la lettera P.",
-          fr: "Commence par la lettre P.",
-          es: "Comienza con la letra P.",
-        },
-        {
-          en: "Rhymes with 'Harris'.",
-          it: "In rima con 'Parigi'.",
-          fr: "Rime avec 'Harris'.",
-          es: "Rima con 'París'.",
-        },
-        {
-          en: "P - A - R - I - _",
-          it: "P - A - R - I - _",
-          fr: "P - A - R - I - _",
-          es: "P - A - R - I - _",
-        },
-      ],
-    },
+          "en": "Starts with R",
+          "it": "Inizia con R"
+        }
+      ]
+    }
   },
   {
-    category: { en: "Science", it: "Scienza", fr: "Science", es: "Ciencia" },
-    answer: { en: "Carbon", it: "Carbonio", fr: "Carbone", es: "Carbono" },
-    hard: {
-      points: 3,
-      question: {
-        en: "This element is essential for all known life forms and forms the backbone of organic chemistry.",
-        it: "Questo elemento è essenziale per tutte le forme di vita conosciute e forma la base della chimica organica.",
-        fr: "Cet élément est essentiel à toutes les formes de vie connues et forme la base de la chimie organique.",
-        es: "Este elemento es esencial para todas las formas de vida conocidas y forma la base de la química orgánica.",
-      },
-      hints: [
-        {
-          en: "It can form four covalent bonds with other atoms.",
-          it: "Può formare quattro legami covalenti con altri atomi.",
-          fr: "Il peut former quatre liaisons covalentes avec d'autres atomes.",
-          es: "Puede formar cuatro enlaces covalentes con otros átomos.",
-        },
-        {
-          en: "It has two stable, naturally occurring isotopes: 12 and 13.",
-          it: "Ha due isotopi stabili naturali: 12 e 13.",
-          fr: "Il possède deux isotopes stables d'origine naturelle: 12 et 13.",
-          es: "Tiene dos isótopos estables de origen natural: 12 y 13.",
-        },
-        {
-          en: "It is the 15th most abundant element in the Earth's crust.",
-          it: "È il 15° elemento più abbondante nella crosta terrestre.",
-          fr: "C'est le 15ème élément le plus abondant dans la croûte terrestre.",
-          es: "Es el 15º elemento más abundante de la corteza terrestre.",
-        },
-      ],
+    "category": {
+      "en": "Geography",
+      "it": "Geografia"
     },
-    medium: {
-      points: 2,
-      question: {
-        en: "This element has atomic number 6 and its symbol is a single letter.",
-        it: "Questo elemento ha numero atomico 6 e il suo simbolo è una singola lettera.",
-        fr: "Cet élément a le numéro atomique 6 et son symbole est une seule lettre.",
-        es: "Este elemento tiene número atómico 6 y su símbolo es una sola letra.",
-      },
-      hints: [
-        {
-          en: "The symbol is 'C'.",
-          it: "Il simbolo è 'C'.",
-          fr: "Le symbole est 'C'.",
-          es: "El símbolo es 'C'.",
-        },
-        {
-          en: "Coal is primarily made of this.",
-          it: "Il carbone è composto principalmente da questo.",
-          fr: "Le charbon en est principalement composé.",
-          es: "El carbón está hecho principalmente de esto.",
-        },
-        {
-          en: "It makes up about 18% of the human body by mass.",
-          it: "Costituisce circa il 18% della massa del corpo umano.",
-          fr: "Il représente environ 18 % de la masse du corps humain.",
-          es: "Constituye aproximadamente el 18 % de la masa del cuerpo humano.",
-        },
-      ],
+    "answer": {
+      "en": "Tokyo",
+      "it": "Tokyo"
     },
-    easy: {
-      points: 1,
-      question: {
-        en: "Diamonds and graphite are both made entirely of which element?",
-        it: "Diamanti e grafite sono entrambi composti interamente da quale elemento?",
-        fr: "Les diamants et le graphite sont tous deux entièrement composés de quel élément ?",
-        es: "¿Los diamantes y el grafito están hechos completamente de qué elemento?",
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Most populous metropolitan area in the world",
+        "it": "Area metropolitana più popolosa al mondo"
       },
-      hints: [
+      "hints": [
         {
-          en: "It sounds like 'car-bon'.",
-          it: "Suona come 'carbo-nio'.",
-          fr: "Ça sonne comme 'car-bone'.",
-          es: "Suena a 'carbo-no'.",
-        },
-        {
-          en: "It starts with a C.",
-          it: "Inizia con la C.",
-          fr: "Ça commence par un C.",
-          es: "Empieza por C.",
-        },
-        {
-          en: "C _ R B O N",
-          it: "C _ R B O N I O",
-          fr: "C _ R B O N E",
-          es: "C A R B _ N O",
-        },
-      ],
+          "en": "Located in Kanto region",
+          "it": "Situata nella regione di Kanto"
+        }
+      ]
     },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Capital of Japan",
+        "it": "Capitale del Giappone"
+      },
+      "hints": [
+        {
+          "en": "Previously called Edo",
+          "it": "Precedentemente chiamata Edo"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Japanese city holding the 2020 Olympics",
+        "it": "Città giapponese delle Olimpiadi 2020"
+      },
+      "hints": [
+        {
+          "en": "T _ K Y O",
+          "it": "T _ K Y O"
+        }
+      ]
+    }
   },
   {
-    category: { en: "History", it: "Storia", fr: "Histoire", es: "Historia" },
-    answer: {
-      en: "Great Pyramid of Giza",
-      it: "Grande Piramide di Giza",
-      fr: "Grande Pyramide de Gizeh",
-      es: "Gran Pirámide de Guiza",
+    "category": {
+      "en": "Geography",
+      "it": "Geografia"
     },
-    hard: {
-      points: 3,
-      question: {
-        en: "This ancient wonder of the world is the only one still standing today, located on the Giza plateau.",
-        it: "Questa antica meraviglia del mondo è l'unica ancora in piedi oggi, situata sull'altopiano di Giza.",
-        fr: "Cette ancienne merveille du monde est la seule encore debout aujourd'hui, située sur le plateau de Gizeh.",
-        es: "Esta antigua maravilla del mundo es la única que sigue en pie hoy, ubicada en la meseta de Guiza.",
+    "answer": {
+      "en": "London",
+      "it": "Londra"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Sits on the river Thames",
+        "it": "Sorge sul fiume Tamigi"
       },
-      hints: [
+      "hints": [
         {
-          en: "Originally covered in polished white limestone.",
-          it: "Originariamente ricoperta di lucente calcare bianco.",
-          fr: "À l'origine recouverte de calcaire blanc poli.",
-          es: "Originalmente cubierta de piedra caliza blanca pulida.",
-        },
-        {
-          en: "It was the tallest man-made structure in the world for over 3,800 years.",
-          it: "E' stata la struttura artificiale più alta del mondo per oltre 3.800 anni.",
-          fr: "Ce fut la plus haute structure construite par l'homme pendant plus de 3 800 ans.",
-          es: "Fue la estructura artificial más alta del mundo durante más de 3.800 años.",
-        },
-        {
-          en: "Built for the Fourth Dynasty pharaoh Khufu.",
-          it: "Costruita per il faraone Cheope della IV dinastia.",
-          fr: "Construite pour le pharaon Khéops de la 4e dynastie.",
-          es: "Construida para el faraón Keops de la IV dinastía.",
-        },
-      ],
+          "en": "Has the Shard",
+          "it": "Ha lo Shard"
+        }
+      ]
     },
-    medium: {
-      points: 2,
-      question: {
-        en: "Built around 2560 BC, this massive structure served as a tomb for Pharaoh Khufu.",
-        it: "Costruita intorno al 2560 a.C., questa struttura massiccia serviva come tomba per il faraone Cheope.",
-        fr: "Construite vers 2560 av. J.-C., cette structure massive servait de tombeau au pharaon Khéops.",
-        es: "Construida alrededor del 2560 a.C., esta estructura masiva sirvió como tumba del faraón Keops.",
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Capital of the UK",
+        "it": "Capitale del Regno Unito"
       },
-      hints: [
+      "hints": [
         {
-          en: "It is located in Egypt.",
-          it: "Si trova in Egitto.",
-          fr: "Elle est située en Égypte.",
-          es: "Se encuentra en Egipto.",
-        },
-        {
-          en: "It is near the Great Sphinx.",
-          it: "Si trova vicino alla Grande Sfinge.",
-          fr: "Elle se trouve près du Grand Sphinx.",
-          es: "Se encuentra cerca de la Gran Esfinge.",
-        },
-        {
-          en: "It has a triangular shape.",
-          it: "Ha una forma triangolare.",
-          fr: "Elle a une forme triangulaire.",
-          es: "Tiene forma triangular.",
-        },
-      ],
+          "en": "Home to Big Ben",
+          "it": "Ospita il Big Ben"
+        }
+      ]
     },
-    easy: {
-      points: 1,
-      question: {
-        en: "What is the name of the largest and oldest of the three pyramids in Giza, Egypt?",
-        it: "Come si chiama la più grande e antica delle tre piramidi di Giza, in Egitto?",
-        fr: "Quel est le nom de la plus grande et la plus ancienne des trois pyramides de Gizeh, en Égypte ?",
-        es: "¿Cómo se llama la más grande y antigua de las tres pirámides de Guiza, en Egipto?",
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Capital of England",
+        "it": "Capitale dell'Inghilterra"
       },
-      hints: [
+      "hints": [
         {
-          en: "It starts with 'Great Pyramid'.",
-          it: "Inizia con 'Grande Piramide'.",
-          fr: "Cela commence par 'Grande Pyramide'.",
-          es: "Empieza por 'Gran Pirámide'.",
-        },
-        {
-          en: "It ends with '...of Giza'.",
-          it: "Finisce con '...di Giza'.",
-          fr: "Cela finit par '...de Gizeh'.",
-          es: "Termina con '...de Guiza'.",
-        },
-        {
-          en: "Just put the two parts together.",
-          it: "Metti insieme le due parti.",
-          fr: "Mettez les deux parties ensemble.",
-          es: "Junta las dos partes.",
-        },
-      ],
-    },
+          "en": "L O N D _ _",
+          "it": "L O N D _ A"
+        }
+      ]
+    }
   },
   {
-    category: {
-      en: "Technology",
-      it: "Tecnologia",
-      fr: "Technologie",
-      es: "Tecnología",
+    "category": {
+      "en": "Geography",
+      "it": "Geografia"
     },
-    answer: { en: "Apple", it: "Apple", fr: "Apple", es: "Apple" },
-    hard: {
-      points: 3,
-      question: {
-        en: "This company, founded in a garage in Cupertino in 1976, revolutionized personal computing.",
-        it: "Questa azienda, fondata in un garage a Cupertino nel 1976, ha rivoluzionato l'informatica personale.",
-        fr: "Cette entreprise, fondée dans un garage à Cupertino en 1976, a révolutionné l'informatique personnelle.",
-        es: "Esta empresa, fundada en un garaje en Cupertino en 1976, revolucionó la informática personal.",
+    "answer": {
+      "en": "Paris",
+      "it": "Parigi"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "City of light",
+        "it": "Città della luce"
       },
-      hints: [
+      "hints": [
         {
-          en: "One of its founders was Steve Wozniak.",
-          it: "Uno dei suoi fondatori fu Steve Wozniak.",
-          fr: "L'un de ses fondateurs était Steve Wozniak.",
-          es: "Uno de sus fundadores fue Steve Wozniak.",
-        },
-        {
-          en: "The company's first highly successful product was the Macintosh.",
-          it: "Il primo prodotto di grande successo dell'azienda fu il Macintosh.",
-          fr: "Le premier produit à grand succès de l'entreprise fut le Macintosh.",
-          es: "El primer producto de gran éxito de la empresa fue el Macintosh.",
-        },
-        {
-          en: "It revolutionized the music industry with the iPod.",
-          it: "Ha rivoluzionato l'industria musicale con l'iPod.",
-          fr: "Il a révolutionné l'industrie de la musique avec l'iPod.",
-          es: "Revolucionó la industria musical con el iPod.",
-        },
-      ],
+          "en": "On the Seine",
+          "it": "Sulla Senna"
+        }
+      ]
     },
-    medium: {
-      points: 2,
-      question: {
-        en: "Steve Jobs co-founded this company that created the iPhone and iPad.",
-        it: "Steve Jobs ha co-fondato questa azienda che ha creato l'iPhone e l'iPad.",
-        fr: "Steve Jobs a cofondé cette entreprise qui a créé l'iPhone et l'iPad.",
-        es: "Steve Jobs cofundó esta empresa que creó el iPhone y el iPad.",
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Home to the Eiffel Tower",
+        "it": "Ospita la Torre Eiffel"
       },
-      hints: [
+      "hints": [
         {
-          en: "Current CEO is Tim Cook.",
-          it: "L'attuale CEO è Tim Cook.",
-          fr: "L'actuel PDG est Tim Cook.",
-          es: "El actual CEO es Tim Cook.",
-        },
-        {
-          en: "Its headquarters is called Apple Park.",
-          it: "Il suo quartier generale si chiama Apple Park.",
-          fr: "Son siège social s'appelle Apple Park.",
-          es: "Su sede se llama Apple Park.",
-        },
-        {
-          en: "It is named after a fruit.",
-          it: "Prende il nome da un frutto.",
-          fr: "Il porte le nom d'un fruit.",
-          es: "Lleva el nombre de una fruta.",
-        },
-      ],
+          "en": "Capital of France",
+          "it": "Capitale della Francia"
+        }
+      ]
     },
-    easy: {
-      points: 1,
-      question: {
-        en: "Which tech company uses a bitten fruit as its logo?",
-        it: "Quale azienda tecnologica usa un frutto morsicato come logo?",
-        fr: "Quelle entreprise technologique utilise un fruit croqué comme logo ?",
-        es: "¿Qué empresa tecnológica usa una fruta mordida como logotipo?",
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Has the Louvre",
+        "it": "Ha il Louvre"
       },
-      hints: [
+      "hints": [
         {
-          en: "It's the fruit that fell on Newton's head.",
-          it: "È il frutto che cadde sulla testa di Newton.",
-          fr: "C'est le fruit qui est tombé sur la tête de Newton.",
-          es: "Es la fruta que cayó en la cabeza de Newton.",
-        },
-        {
-          en: "Green or red, keeps the doctor away.",
-          it: "Una al giorno leva il medico di torno.",
-          fr: "Une par jour éloigne le médecin.",
-          es: "Una al día mantiene alejado al médico.",
-        },
-        { en: "_ P P L _", it: "A P _ L E", fr: "A P _ L E", es: "A P P _ E" },
-      ],
-    },
+          "en": "Starts with P",
+          "it": "Inizia con P"
+        }
+      ]
+    }
   },
   {
-    category: { en: "Cinema", it: "Cinema", fr: "Cinéma", es: "Cine" },
-    answer: {
-      en: "Forrest Gump",
-      it: "Forrest Gump",
-      fr: "Forrest Gump",
-      es: "Forrest Gump",
+    "category": {
+      "en": "Geography",
+      "it": "Geografia"
     },
-    hard: {
-      points: 3,
-      question: {
-        en: "This 1994 film follows a man with a low IQ who unwittingly influences historical events.",
-        it: "Questo film del 1994 segue un uomo con un basso QI che inconsapevolmente influenza eventi storici.",
-        fr: "Ce film de 1994 suit un homme au QI faible qui influence involontairement des événements historiques.",
-        es: "Esta película de 1994 sigue a un hombre con bajo coeficiente intelectual que influye en eventos históricos.",
+    "answer": {
+      "en": "Berlin",
+      "it": "Berlino"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Separated by a wall until 1989",
+        "it": "Separata da un muro fino al 1989"
       },
-      hints: [
+      "hints": [
         {
-          en: "Directed by Robert Zemeckis.",
-          it: "Diretto da Robert Zemeckis.",
-          fr: "Réalisé par Robert Zemeckis.",
-          es: "Dirigida por Robert Zemeckis.",
-        },
-        {
-          en: "The main character invests in 'some kind of fruit company' (Apple).",
-          it: "Il protagonista investe in 'una specie di azienda di frutta' (Apple).",
-          fr: "Le personnage principal investit dans 'une sorte d'entreprise de fruits' (Apple).",
-          es: "El personaje principal invierte en 'una especie de compañía frutera' (Apple).",
-        },
-        {
-          en: "He teaches Elvis his famous dance moves.",
-          it: "Lui insegna a Elvis i suoi famosi passi di danza.",
-          fr: "Il apprend à Elvis ses célèbres pas de danse.",
-          es: "Le enseña a Elvis sus famosos pasos de baile.",
-        },
-      ],
+          "en": "Brandenburg Gate is here",
+          "it": "Qui c'è la Porta di Brandeburgo"
+        }
+      ]
     },
-    medium: {
-      points: 2,
-      question: {
-        en: "Tom Hanks won an Oscar for this film where he says 'Life is like a box of chocolates.'",
-        it: "Tom Hanks ha vinto un Oscar per questo film in cui dice 'La vita è come una scatola di cioccolatini.'",
-        fr: "Tom Hanks a remporté un Oscar pour ce film où il dit 'La vie est comme une boîte de chocolats.'",
-        es: "Tom Hanks ganó un Oscar por esta película donde dice 'La vida es como una caja de bombones.'",
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Capital of Germany",
+        "it": "Capitale della Germania"
       },
-      hints: [
+      "hints": [
         {
-          en: "His best friend in the army was Bubba.",
-          it: "Il suo migliore amico nell'esercito era Bubba.",
-          fr: "Son meilleur ami à l'armée était Bubba.",
-          es: "Su mejor amigo en el ejército era Bubba.",
-        },
-        {
-          en: "He runs across the USA.",
-          it: "Corre attraverso gli Stati Uniti.",
-          fr: "Il court à travers les États-Unis.",
-          es: "Corre a través de los Estados Unidos.",
-        },
-        {
-          en: "Lieutenant Dan is his commander.",
-          it: "Il tenente Dan è il suo comandante.",
-          fr: "Le lieutenant Dan est son commandant.",
-          es: "El teniente Dan es su comandante.",
-        },
-      ],
+          "en": "In central Europe",
+          "it": "In centro Europa"
+        }
+      ]
     },
-    easy: {
-      points: 1,
-      question: {
-        en: "_____ Gump — name the 1994 film starring Tom Hanks.",
-        it: "_____ Gump — come si chiama il film del 1994 con Tom Hanks?",
-        fr: "_____ Gump — nommez le film de 1994 avec Tom Hanks.",
-        es: "_____ Gump — nombra la película de 1994 protagonizada por Tom Hanks.",
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "German capital",
+        "it": "Capitale tedesca"
       },
-      hints: [
+      "hints": [
         {
-          en: "The missing word is his first name.",
-          it: "La parola mancante è il suo nome di battesimo.",
-          fr: "Le mot manquant est son prénom.",
-          es: "La palabra que falta es su nombre.",
-        },
-        {
-          en: "F o r _ e s t",
-          it: "F o r _ e s t",
-          fr: "F o r _ e s t",
-          es: "F o r _ e s t",
-        },
-        {
-          en: "Run, _____, run!",
-          it: "Corri, _____, corri!",
-          fr: "Cours, _____, cours !",
-          es: "¡Corre, _____, corre!",
-        },
-      ],
-    },
+          "en": "B E R L I _",
+          "it": "B E R L I N _"
+        }
+      ]
+    }
   },
+  {
+    "category": {
+      "en": "Geography",
+      "it": "Geografia"
+    },
+    "answer": {
+      "en": "Madrid",
+      "it": "Madrid"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Highest capital in EU",
+        "it": "Capitale più alta dell'UE"
+      },
+      "hints": [
+        {
+          "en": "Located on the Manzanares",
+          "it": "Situata sul Manzanares"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Capital of Spain",
+        "it": "Capitale della Spagna"
+      },
+      "hints": [
+        {
+          "en": "Home to the Prado museum",
+          "it": "Ospita il museo del Prado"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Spanish capital",
+        "it": "Capitale spagnola"
+      },
+      "hints": [
+        {
+          "en": "Starts with M",
+          "it": "Inizia con M"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Geography",
+      "it": "Geografia"
+    },
+    "answer": {
+      "en": "New York",
+      "it": "New York"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "The big apple",
+        "it": "La grande mela"
+      },
+      "hints": [
+        {
+          "en": "In the state with the same name",
+          "it": "Nello stato omonimo"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Has the Statue of Liberty",
+        "it": "Ha la Statua della Libertà"
+      },
+      "hints": [
+        {
+          "en": "Contains Manhattan",
+          "it": "Contiene Manhattan"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Most populous US city",
+        "it": "Città più popolosa USA"
+      },
+      "hints": [
+        {
+          "en": "N_W Y_RK",
+          "it": "N_W Y_RK"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Geography",
+      "it": "Geografia"
+    },
+    "answer": {
+      "en": "Sydney",
+      "it": "Sydney"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Home to a famous Opera House",
+        "it": "Ospita una famosa Opera House"
+      },
+      "hints": [
+        {
+          "en": "In New South Wales",
+          "it": "Nel Nuovo Galles del Sud"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Largest city in Australia",
+        "it": "La più grande città in Australia"
+      },
+      "hints": [
+        {
+          "en": "Not the capital though",
+          "it": "Ma non è la capitale"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Australian city with a big bridge",
+        "it": "Città australiana con un grande ponte"
+      },
+      "hints": [
+        {
+          "en": "S Y D _ _ Y",
+          "it": "S Y D _ _ Y"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Geography",
+      "it": "Geografia"
+    },
+    "answer": {
+      "en": "Cairo",
+      "it": "Il Cairo"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Largest city in the Arab world",
+        "it": "Città più grande del mondo arabo"
+      },
+      "hints": [
+        {
+          "en": "On the Nile",
+          "it": "Sul Nilo"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Near the Giza pyramids",
+        "it": "Vicino alle piramidi di Giza"
+      },
+      "hints": [
+        {
+          "en": "Capital of Egypt",
+          "it": "Capitale dell'Egitto"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Egyptian capital",
+        "it": "Capitale egiziana"
+      },
+      "hints": [
+        {
+          "en": "C A I R _",
+          "it": "I L  C A I R _"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Geography",
+      "it": "Geografia"
+    },
+    "answer": {
+      "en": "Moscow",
+      "it": "Mosca"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Has the Kremlin",
+        "it": "Ha il Cremlino"
+      },
+      "hints": [
+        {
+          "en": "On the Moskva river",
+          "it": "Sul fiume Moscova"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Capital of Russia",
+        "it": "Capitale della Russia"
+      },
+      "hints": [
+        {
+          "en": "Red Square is here",
+          "it": "Qui c'è la Piazza Rossa"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Russian capital",
+        "it": "Capitale russa"
+      },
+      "hints": [
+        {
+          "en": "M O S C _",
+          "it": "M O S C _"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Science",
+      "it": "Scienza"
+    },
+    "answer": {
+      "en": "Carbon",
+      "it": "Carbonio"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Basis of all known life",
+        "it": "Base di tutta la vita conosciuta"
+      },
+      "hints": [
+        {
+          "en": "Atomic number 6",
+          "it": "Numero atomico 6"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Forms diamonds and graphite",
+        "it": "Forma diamanti e grafite"
+      },
+      "hints": [
+        {
+          "en": "Symbol C",
+          "it": "Simbolo C"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "C in CO2",
+        "it": "La C nella CO2"
+      },
+      "hints": [
+        {
+          "en": "C _ R B O N",
+          "it": "C _ R B O N I O"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Science",
+      "it": "Scienza"
+    },
+    "answer": {
+      "en": "Oxygen",
+      "it": "Ossigeno"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Required for human respiration",
+        "it": "Richiesto per la respirazione umana"
+      },
+      "hints": [
+        {
+          "en": "Atomic number 8",
+          "it": "Numero atomico 8"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Gas that makes up 21% of atmosphere",
+        "it": "Gas che forma il 21% dell'atmosfera"
+      },
+      "hints": [
+        {
+          "en": "Symbol O",
+          "it": "Simbolo O"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "We breathe this gas",
+        "it": "Respiriamo questo gas"
+      },
+      "hints": [
+        {
+          "en": "O _ Y G E N",
+          "it": "O S S I G E N O"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Science",
+      "it": "Scienza"
+    },
+    "answer": {
+      "en": "Gravity",
+      "it": "Gravità"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Force that gives weight to objects",
+        "it": "Forza che dà peso agli oggetti"
+      },
+      "hints": [
+        {
+          "en": "Newton formulated it",
+          "it": "Newton la formulò"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Keeps planets in orbit",
+        "it": "Mantiene i pianeti in orbita"
+      },
+      "hints": [
+        {
+          "en": "Why apples fall",
+          "it": "Perché le mele cadono"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Pulls you to the ground",
+        "it": "Ti attira a terra"
+      },
+      "hints": [
+        {
+          "en": "G R A V I T _",
+          "it": "G R A V I T _"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Science",
+      "it": "Scienza"
+    },
+    "answer": {
+      "en": "Electron",
+      "it": "Elettrone"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Subatomic particle with negative charge",
+        "it": "Particella subatomica con carica negativa"
+      },
+      "hints": [
+        {
+          "en": "Orbits the nucleus",
+          "it": "Orbita intorno al nucleo"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Lighter than a proton",
+        "it": "Più leggero di un protone"
+      },
+      "hints": [
+        {
+          "en": "Moves in circuits",
+          "it": "Si muove nei circuiti"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Electricity is the flow of...?",
+        "it": "L'elettricità è il flusso di...?"
+      },
+      "hints": [
+        {
+          "en": "E L E C T R _ _",
+          "it": "E L E T T R _ _ E"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Science",
+      "it": "Scienza"
+    },
+    "answer": {
+      "en": "Water",
+      "it": "Acqua"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Universal solvent",
+        "it": "Solvente universale"
+      },
+      "hints": [
+        {
+          "en": "H2O",
+          "it": "H2O"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Covers 71% of Earth",
+        "it": "Copre il 71% della Terra"
+      },
+      "hints": [
+        {
+          "en": "Essential for hydration",
+          "it": "Essenziale per l'idratazione"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Liquid ice",
+        "it": "Ghiaccio liquido"
+      },
+      "hints": [
+        {
+          "en": "W A T E _",
+          "it": "A C Q U _"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Science",
+      "it": "Scienza"
+    },
+    "answer": {
+      "en": "Photosynthesis",
+      "it": "Fotosintesi"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Process used by plants to turn light into energy",
+        "it": "Processo usato dalle piante per trasformare la luce in energia"
+      },
+      "hints": [
+        {
+          "en": "Uses chlorophyll",
+          "it": "Usa la clorofilla"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Converts CO2 and water into glucose",
+        "it": "Converte CO2 e acqua in glucosio"
+      },
+      "hints": [
+        {
+          "en": "Plants do this in the sun",
+          "it": "Le piante lo fanno al sole"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "How plants 'eat'",
+        "it": "Come 'mangiano' le piante"
+      },
+      "hints": [
+        {
+          "en": "Starts with P",
+          "it": "Inizia con F"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Science",
+      "it": "Scienza"
+    },
+    "answer": {
+      "en": "Mars",
+      "it": "Marte"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Fourth planet from the Sun",
+        "it": "Quarto pianeta dal Sole"
+      },
+      "hints": [
+        {
+          "en": "Has moons Phobos and Deimos",
+          "it": "Ha lune Phobos e Deimos"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "The Red Planet",
+        "it": "Il Pianeta Rosso"
+      },
+      "hints": [
+        {
+          "en": "Named after Roman god of war",
+          "it": "Prende il nome dal dio romano della guerra"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Elon Musk wants to go here",
+        "it": "Elon Musk vuole andarci"
+      },
+      "hints": [
+        {
+          "en": "M A R _",
+          "it": "M A R T _"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Science",
+      "it": "Scienza"
+    },
+    "answer": {
+      "en": "DNA",
+      "it": "DNA"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Molecule that carries genetic instructions",
+        "it": "Molecola che porta le istruzioni genetiche"
+      },
+      "hints": [
+        {
+          "en": "Double helix structure",
+          "it": "Struttura a doppia elica"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Deoxyribonucleic acid",
+        "it": "Acido desossiribonucleico"
+      },
+      "hints": [
+        {
+          "en": "Found in chromosomes",
+          "it": "Trovato nei cromosomi"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Your genetic code",
+        "it": "Il tuo codice genetico"
+      },
+      "hints": [
+        {
+          "en": "D _ A",
+          "it": "D _ A"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Science",
+      "it": "Scienza"
+    },
+    "answer": {
+      "en": "Magnet",
+      "it": "Magnete"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Material that produces a magnetic field",
+        "it": "Materiale che produce un campo magnetico"
+      },
+      "hints": [
+        {
+          "en": "Has North and South poles",
+          "it": "Ha poli Nord e Sud"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Attracts iron",
+        "it": "Attira il ferro"
+      },
+      "hints": [
+        {
+          "en": "Used on fridge doors",
+          "it": "Usato sulle porte del frigo"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Opposites attract",
+        "it": "Gli opposti si attraggono"
+      },
+      "hints": [
+        {
+          "en": "M A G N _ _",
+          "it": "M A G N E _ E"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Science",
+      "it": "Scienza"
+    },
+    "answer": {
+      "en": "Speed of Light",
+      "it": "Velocità della luce"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Approximately 300,000 km/s",
+        "it": "Circa 300.000 km/s"
+      },
+      "hints": [
+        {
+          "en": "Constant 'c' in Einstein's equation",
+          "it": "La costante 'c' nell'equazione di Einstein"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Fastest thing in the universe",
+        "it": "La cosa più veloce dell'universo"
+      },
+      "hints": [
+        {
+          "en": "Nothing can travel faster",
+          "it": "Nulla può viaggiare più veloce"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Light's pace",
+        "it": "Il passo della luce"
+      },
+      "hints": [
+        {
+          "en": "S P E E D...",
+          "it": "V E L O C I T A..."
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "History",
+      "it": "Storia"
+    },
+    "answer": {
+      "en": "Julius Caesar",
+      "it": "Giulio Cesare"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Roman general who crossed the Rubicon",
+        "it": "Generale romano che attraversò il Rubicone"
+      },
+      "hints": [
+        {
+          "en": "Assassinated on the Ides of March",
+          "it": "Assassinato alle Idi di Marzo"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Dictator for life of the Roman Republic",
+        "it": "Dittatore a vita della Repubblica Romana"
+      },
+      "hints": [
+        {
+          "en": "Said 'Veni, vidi, vici'",
+          "it": "Disse 'Veni, vidi, vici'"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Famous Roman leader",
+        "it": "Famoso leader romano"
+      },
+      "hints": [
+        {
+          "en": "J U L _ _ S  C _ _ S E R",
+          "it": "G I U L I O  C _ S A _ E"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "History",
+      "it": "Storia"
+    },
+    "answer": {
+      "en": "World War II",
+      "it": "Seconda Guerra Mondiale"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Global conflict from 1939 to 1945",
+        "it": "Conflitto globale dal 1939 al 1945"
+      },
+      "hints": [
+        {
+          "en": "Ended with atomic bombs",
+          "it": "Finita con le bombe atomiche"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Axis vs Allies",
+        "it": "Asse vs Alleati"
+      },
+      "hints": [
+        {
+          "en": "Fought in the 1940s",
+          "it": "Combattuta negli anni '40"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "The second global war",
+        "it": "La seconda guerra globale"
+      },
+      "hints": [
+        {
+          "en": "W W 2",
+          "it": "W W 2"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "History",
+      "it": "Storia"
+    },
+    "answer": {
+      "en": "Cleopatra",
+      "it": "Cleopatra"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Last active ruler of the Ptolemaic Kingdom of Egypt",
+        "it": "Ultima regina del Regno Tolemaico d'Egitto"
+      },
+      "hints": [
+        {
+          "en": "Had relationships with Caesar and Antony",
+          "it": "Ebbe relazioni con Cesare e Antonio"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Famous Egyptian Queen",
+        "it": "Famosa Regina Egiziana"
+      },
+      "hints": [
+        {
+          "en": "Bitten by an asp",
+          "it": "Morsa da un aspide"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Queen of the Nile",
+        "it": "Regina del Nilo"
+      },
+      "hints": [
+        {
+          "en": "C L E O _ _ T R A",
+          "it": "C L E O P _ _ R A"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "History",
+      "it": "Storia"
+    },
+    "answer": {
+      "en": "French Revolution",
+      "it": "Rivoluzione Francese"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Began in 1789 with the storming of the Bastille",
+        "it": "Iniziò nel 1789 con la presa della Bastiglia"
+      },
+      "hints": [
+        {
+          "en": "Led to the Reign of Terror",
+          "it": "Portò al Regno del Terrore"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Overthrew Louis XVI",
+        "it": "Rovesciò Luigi XVI"
+      },
+      "hints": [
+        {
+          "en": "Guillotine was heavily used",
+          "it": "La ghigliottina fu molto usata"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Liberty, Equality, Fraternity",
+        "it": "Libertà, Uguaglianza, Fraternità"
+      },
+      "hints": [
+        {
+          "en": "Starts with F",
+          "it": "Inizia con R"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "History",
+      "it": "Storia"
+    },
+    "answer": {
+      "en": "Leonardo da Vinci",
+      "it": "Leonardo da Vinci"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Italian polymath of the Renaissance",
+        "it": "Polimata italiano del Rinascimento"
+      },
+      "hints": [
+        {
+          "en": "Painted the Mona Lisa",
+          "it": "Dipinse la Gioconda"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Designed early flying machines",
+        "it": "Progettò le prime macchine volanti"
+      },
+      "hints": [
+        {
+          "en": "Painted The Last Supper",
+          "it": "Dipinse L'Ultima Cena"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Famous Italian artist & inventor",
+        "it": "Famoso artista e inventore italiano"
+      },
+      "hints": [
+        {
+          "en": "L E O N A R _ _",
+          "it": "L E O N A R _ _"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "History",
+      "it": "Storia"
+    },
+    "answer": {
+      "en": "Titanic",
+      "it": "Titanic"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Sank on its maiden voyage in 1912",
+        "it": "Affondò nel suo viaggio inaugurale nel 1912"
+      },
+      "hints": [
+        {
+          "en": "Hit an iceberg",
+          "it": "Colpì un iceberg"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Famous passenger ship",
+        "it": "Famosa nave passeggeri"
+      },
+      "hints": [
+        {
+          "en": "Called unsinkable",
+          "it": "Definita inaffondabile"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Huge sunken ship",
+        "it": "Enorme nave affondata"
+      },
+      "hints": [
+        {
+          "en": "T I T A _ I C",
+          "it": "T I T A _ I C"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "History",
+      "it": "Storia"
+    },
+    "answer": {
+      "en": "Moon Landing",
+      "it": "Sbarco sulla Luna"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Apollo 11 mission achieved this in 1969",
+        "it": "La missione Apollo 11 lo ottenne nel 1969"
+      },
+      "hints": [
+        {
+          "en": "One small step for man",
+          "it": "Un piccolo passo per l'uomo"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Neil Armstrong was the first",
+        "it": "Neil Armstrong fu il primo"
+      },
+      "hints": [
+        {
+          "en": "Space race victory",
+          "it": "Vittoria della corsa allo spazio"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Walking on Earth's satellite",
+        "it": "Camminare sul satellite della Terra"
+      },
+      "hints": [
+        {
+          "en": "M _ _ N  L _ N D I N G",
+          "it": "S B _ _ C O  L _ N A"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "History",
+      "it": "Storia"
+    },
+    "answer": {
+      "en": "Napoleon",
+      "it": "Napoleone"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Emperor of the French in 1804",
+        "it": "Imperatore dei Francesi nel 1804"
+      },
+      "hints": [
+        {
+          "en": "Defeated at Waterloo",
+          "it": "Sconfitto a Waterloo"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Famous short conqueror",
+        "it": "Famoso conquistatore basso"
+      },
+      "hints": [
+        {
+          "en": "Exiled to Elba",
+          "it": "Esiliato all'Elba"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "French general",
+        "it": "Generale francese"
+      },
+      "hints": [
+        {
+          "en": "N A P O L _ _ N",
+          "it": "N A P O L _ O N E"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "History",
+      "it": "Storia"
+    },
+    "answer": {
+      "en": "Colosseum",
+      "it": "Colosseo"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Flavian Amphitheatre in Rome",
+        "it": "Anfiteatro Flavio a Roma"
+      },
+      "hints": [
+        {
+          "en": "Gladiators fought here",
+          "it": "I gladiatori combattevano qui"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Iconic Roman monument",
+        "it": "Iconico monumento romano"
+      },
+      "hints": [
+        {
+          "en": "Symbol of Rome",
+          "it": "Simbolo di Roma"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Big arena in Italy",
+        "it": "Grande arena in Italia"
+      },
+      "hints": [
+        {
+          "en": "C O L O _ S _ U M",
+          "it": "C O L O S _ E O"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "History",
+      "it": "Storia"
+    },
+    "answer": {
+      "en": "Vikings",
+      "it": "Vichinghi"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Norse seafarers from late 8th to 11th century",
+        "it": "Navigatori norreni dalla fine dell'8° all'11° secolo"
+      },
+      "hints": [
+        {
+          "en": "Raided in longships",
+          "it": "Gareggiavano nei drakkar"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Warriors with horned helmets (myth)",
+        "it": "Guerrieri con elmi cornuti (falso mito)"
+      },
+      "hints": [
+        {
+          "en": "From Scandinavia",
+          "it": "Dalla Scandinavia"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Norse warriors",
+        "it": "Guerrieri norreni"
+      },
+      "hints": [
+        {
+          "en": "V I K I _ _ S",
+          "it": "V I C H I _ G _ I"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Cinema",
+      "it": "Cinema"
+    },
+    "answer": {
+      "en": "Titanic",
+      "it": "Titanic"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Won 11 Oscars in 1998 including Best Picture",
+        "it": "Vinse 11 Oscar nel 1998 incluso Miglior Film"
+      },
+      "hints": [
+        {
+          "en": "Directed by James Cameron",
+          "it": "Diretto da James Cameron"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Stars Leonardo DiCaprio and Kate Winslet",
+        "it": "Con Leonardo DiCaprio e Kate Winslet"
+      },
+      "hints": [
+        {
+          "en": "Romance on a sinking ship",
+          "it": "Romance su una nave che affonda"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Jack and Rose",
+        "it": "Jack e Rose"
+      },
+      "hints": [
+        {
+          "en": "T I T A _ I C",
+          "it": "T I T A _ I C"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Cinema",
+      "it": "Cinema"
+    },
+    "answer": {
+      "en": "Star Wars",
+      "it": "Star Wars"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "George Lucas space opera",
+        "it": "Space opera di George Lucas"
+      },
+      "hints": [
+        {
+          "en": "Takes place a long time ago in a galaxy far, far away",
+          "it": "Si svolge tanto tempo fa in una galassia lontana"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Features Jedi and Sith",
+        "it": "Include Jedi e Sith"
+      },
+      "hints": [
+        {
+          "en": "Lightsabers!",
+          "it": "Spade laser!"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Luke, I am your father",
+        "it": "Luke, sono tuo padre"
+      },
+      "hints": [
+        {
+          "en": "S T A R  W _ _ S",
+          "it": "S T A R  W A R _"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Cinema",
+      "it": "Cinema"
+    },
+    "answer": {
+      "en": "The Matrix",
+      "it": "Matrix"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "1999 sci-fi action film by the Wachowskis",
+        "it": "Film sci-fi d'azione del 1999 delle sorelle Wachowski"
+      },
+      "hints": [
+        {
+          "en": "Neo learns the truth about reality",
+          "it": "Neo scopre la verità sulla realtà"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Red pill or blue pill",
+        "it": "Pillola rossa o pillola blu"
+      },
+      "hints": [
+        {
+          "en": "Dodging bullets",
+          "it": "Schivare i proiettili"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Keanu Reeves as Neo",
+        "it": "Keanu Reeves come Neo"
+      },
+      "hints": [
+        {
+          "en": "M A T _ I X",
+          "it": "M A T _ I X"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Cinema",
+      "it": "Cinema"
+    },
+    "answer": {
+      "en": "Avatar",
+      "it": "Avatar"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Highest-grossing film of all time",
+        "it": "Film con i maggiori incassi di tutti i tempi"
+      },
+      "hints": [
+        {
+          "en": "Set on Pandora",
+          "it": "Ambientato su Pandora"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Blue aliens called Na'vi",
+        "it": "Alieni blu chiamati Na'vi"
+      },
+      "hints": [
+        {
+          "en": "Directed by James Cameron (again)",
+          "it": "Diretto da James Cameron (di nuovo)"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Pocahontas in space",
+        "it": "Pocahontas nello spazio"
+      },
+      "hints": [
+        {
+          "en": "A V A _ A R",
+          "it": "A V A _ A R"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Cinema",
+      "it": "Cinema"
+    },
+    "answer": {
+      "en": "Forrest Gump",
+      "it": "Forrest Gump"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "1994 film where Tom Hanks plays a simple man",
+        "it": "Film del 1994 in cui Tom Hanks interpreta un uomo semplice"
+      },
+      "hints": [
+        {
+          "en": "Life is like a box of chocolates",
+          "it": "La vita è come una scatola di cioccolatini"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "He runs a lot",
+        "it": "Corre molto"
+      },
+      "hints": [
+        {
+          "en": "Loves Jenny",
+          "it": "Ama Jenny"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Run, Forrest, run!",
+        "it": "Corri, Forrest, corri!"
+      },
+      "hints": [
+        {
+          "en": "F O R R _ S T",
+          "it": "F O R R _ S T"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Cinema",
+      "it": "Cinema"
+    },
+    "answer": {
+      "en": "Jurassic Park",
+      "it": "Jurassic Park"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "1993 Spielberg film about cloned dinosaurs",
+        "it": "Film di Spielberg del 1993 su dinosauri clonati"
+      },
+      "hints": [
+        {
+          "en": "Based on Michael Crichton's novel",
+          "it": "Basato sul romanzo di Michael Crichton"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Theme park goes wrong",
+        "it": "Parco a tema va storto"
+      },
+      "hints": [
+        {
+          "en": "Life finds a way",
+          "it": "La vita trova un modo"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "T-Rex chase",
+        "it": "Inseguimento del T-Rex"
+      },
+      "hints": [
+        {
+          "en": "J U R A S _ I C",
+          "it": "J U R A S S _ C"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Cinema",
+      "it": "Cinema"
+    },
+    "answer": {
+      "en": "The Godfather",
+      "it": "Il Padrino"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "1972 crime film directed by Francis Ford Coppola",
+        "it": "Film poliziesco del 1972 di Francis Ford Coppola"
+      },
+      "hints": [
+        {
+          "en": "Marlon Brando is Don Vito Corleone",
+          "it": "Marlon Brando è Don Vito Corleone"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "An offer he can't refuse",
+        "it": "Un'offerta che non si può rifiutare"
+      },
+      "hints": [
+        {
+          "en": "Mafia family saga",
+          "it": "Saga di una famiglia mafiosa"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Famous mob movie",
+        "it": "Famoso film di mafiosi"
+      },
+      "hints": [
+        {
+          "en": "G O D _ A T H E R",
+          "it": "P A D _ I N O"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Cinema",
+      "it": "Cinema"
+    },
+    "answer": {
+      "en": "Harry Potter",
+      "it": "Harry Potter"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Boy wizard movie franchise",
+        "it": "Franchise cinematografico del mago ragazzino"
+      },
+      "hints": [
+        {
+          "en": "Based on J.K. Rowling's books",
+          "it": "Basato sui libri di J.K. Rowling"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Hogwarts School of Witchcraft and Wizardry",
+        "it": "Scuola di Magia e Stregoneria di Hogwarts"
+      },
+      "hints": [
+        {
+          "en": "Fights Voldemort",
+          "it": "Combatte Voldemort"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "The boy who lived",
+        "it": "Il bambino sopravvissuto"
+      },
+      "hints": [
+        {
+          "en": "H A R _ Y",
+          "it": "H A R _ Y"
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Cinema",
+      "it": "Cinema"
+    },
+    "answer": {
+      "en": "Lord of the Rings",
+      "it": "Signore degli Anelli"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "Fantasy trilogy directed by Peter Jackson",
+        "it": "Trilogia fantasy diretta da Peter Jackson"
+      },
+      "hints": [
+        {
+          "en": "Based on Tolkien's books",
+          "it": "Basata sui libri di Tolkien"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Journey to Mordor",
+        "it": "Viaggio verso Mordor"
+      },
+      "hints": [
+        {
+          "en": "One ring to rule them all",
+          "it": "Un anello per domarli"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Frodo and Sam",
+        "it": "Frodo e Sam"
+      },
+      "hints": [
+        {
+          "en": "L O R D...",
+          "it": "S I G N O R E..."
+        }
+      ]
+    }
+  },
+  {
+    "category": {
+      "en": "Cinema",
+      "it": "Cinema"
+    },
+    "answer": {
+      "en": "Inception",
+      "it": "Inception"
+    },
+    "hard": {
+      "points": 3,
+      "question": {
+        "en": "2010 sci-fi heist thriller by Christopher Nolan",
+        "it": "Thriller sci-fi del 2010 di Christopher Nolan"
+      },
+      "hints": [
+        {
+          "en": "Planting an idea in a dream",
+          "it": "Innestare un'idea in un sogno"
+        }
+      ]
+    },
+    "medium": {
+      "points": 2,
+      "question": {
+        "en": "Dreams within dreams",
+        "it": "Sogni dentro i sogni"
+      },
+      "hints": [
+        {
+          "en": "Spinning top totem",
+          "it": "Totem della trottola"
+        }
+      ]
+    },
+    "easy": {
+      "points": 1,
+      "question": {
+        "en": "Leonardo DiCaprio in dreams",
+        "it": "Leonardo DiCaprio nei sogni"
+      },
+      "hints": [
+        {
+          "en": "I N C _ P T I O N",
+          "it": "I N C _ P T I O N"
+        }
+      ]
+    }
+  }
 ];

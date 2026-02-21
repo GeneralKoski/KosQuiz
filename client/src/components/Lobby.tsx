@@ -2,7 +2,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   Brain,
   Check,
+  ChevronDown,
   Copy,
+  FolderOpen,
   Play,
   Settings2,
   Sparkles,
@@ -10,7 +12,7 @@ import {
   Users,
   Zap,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import socket from "../socket";
 import type { Difficulty, LobbyInfo } from "../types";
@@ -18,12 +20,19 @@ import type { Difficulty, LobbyInfo } from "../types";
 interface LobbyProps {
   lobby: LobbyInfo;
   playerName: string;
+  initialError?: string;
+  onClearError?: () => void;
 }
 
-export default function Lobby({ lobby }: LobbyProps) {
+export default function Lobby({
+  lobby,
+  playerName,
+  initialError,
+  onClearError,
+}: LobbyProps) {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(initialError ? t(initialError) : "");
 
   const [difficulty, setDifficulty] = useState<Difficulty>("turn");
   const [category, setCategory] = useState<string>("random");
@@ -35,6 +44,13 @@ export default function Lobby({ lobby }: LobbyProps) {
   }, [lobby.difficulty, lobby.category]);
 
   useEffect(() => {
+    if (initialError) {
+      setError(t(initialError));
+      onClearError?.();
+    }
+  }, [initialError, t, onClearError]);
+
+  useEffect(() => {
     const handleGameError = ({ message }: { message: string }) => {
       setError(t(message));
     };
@@ -43,6 +59,22 @@ export default function Lobby({ lobby }: LobbyProps) {
       socket.off("game:error", handleGameError);
     };
   }, [t]);
+
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsCategoryOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const isHost = lobby.hostId === socket.id;
   const canStart = lobby.players.length >= 2;
@@ -69,18 +101,19 @@ export default function Lobby({ lobby }: LobbyProps) {
     socket.emit("lobby:updateSettings", { difficulty: newDiff });
   };
 
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCategorySelect = (id: string) => {
     if (!isHost) return;
-    setCategory(e.target.value);
-    socket.emit("lobby:updateSettings", { category: e.target.value });
+    setCategory(id);
+    socket.emit("lobby:updateSettings", { category: id });
+    setIsCategoryOpen(false);
   };
 
   const categoriesList = [
-    { id: "random", label: t("lobby.catRandom", "Mix Casuale") },
-    { id: "Geography", label: t("lobby.catGeography", "Geografia") },
-    { id: "Science", label: t("lobby.catScience", "Scienza") },
-    { id: "History", label: t("lobby.catHistory", "Storia") },
-    { id: "Cinema", label: t("lobby.catCinema", "Cinema") },
+    { id: "random", label: t("lobby.catRandom") },
+    { id: "Geography", label: t("lobby.catGeography") },
+    { id: "Science", label: t("lobby.catScience") },
+    { id: "History", label: t("lobby.catHistory") },
+    { id: "Cinema", label: t("lobby.catCinema") },
   ];
 
   // Difficulty configs for UI
@@ -168,37 +201,74 @@ export default function Lobby({ lobby }: LobbyProps) {
             <h3 className="text-xs font-black text-white/40 uppercase tracking-[0.2em] flex items-center justify-between mb-6">
               <span className="flex items-center gap-2">
                 <Settings2 size={16} />
-                Impostazioni Partita
+                {t("lobby.settings")}
               </span>
               {!isHost && (
                 <span className="text-[10px] bg-white/5 text-white/50 px-2 py-1 rounded border border-white/10 tracking-widest uppercase">
-                  Solo l'host può modificare
+                  {t("lobby.onlyHostDesc")}
                 </span>
               )}
             </h3>
 
             <div className="space-y-4">
-              <div className="text-sm font-bold text-white/80">Categoria</div>
-              <div className="relative">
-                <select
-                  value={category}
-                  onChange={handleCategoryChange}
-                  disabled={!isHost}
-                  className="w-full bg-[#0b0f19] border border-white/5 rounded-2xl px-5 py-4 text-sm font-black text-white/80 focus:outline-none focus:border-[var(--accent-color)]/30 focus:ring-1 focus:ring-[var(--accent-color)]/30 appearance-none transition-all hover:bg-white/5 data-[disabled=true]:opacity-50 mb-2 disabled:cursor-not-allowed"
+              <div className="text-sm font-bold text-white/80">
+                {t("lobby.categoryDesc")}
+              </div>
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => isHost && setIsCategoryOpen(!isCategoryOpen)}
+                  className={`w-full flex items-center justify-between bg-[#0b0f19] border rounded-2xl px-5 py-4 text-sm font-black text-white/80 transition-all ${isCategoryOpen ? "border-[var(--accent-color)]/50 ring-1 ring-[var(--accent-color)]/30" : "border-white/5 hover:bg-white/5"} ${!isHost ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                 >
-                  {categoriesList.map((cat) => (
-                    <option key={cat.id} value={cat.id} className="bg-[#111]">
-                      {cat.label}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute top-1/2 right-4 -translate-y-1/2 pointer-events-none text-white/30">
-                  <Settings2 size={16} />
-                </div>
+                  <div className="flex items-center gap-3 w-full overflow-hidden">
+                    <FolderOpen
+                      size={18}
+                      className="text-[var(--accent-color)] shrink-0"
+                    />
+                    <span className="truncate">
+                      {categoriesList.find((c) => c.id === category)?.label ||
+                        t("lobby.catRandom")}
+                    </span>
+                  </div>
+                  {isHost && (
+                    <ChevronDown
+                      size={18}
+                      className={`text-white/40 transition-transform shrink-0 ml-3 ${isCategoryOpen ? "rotate-180" : ""}`}
+                    />
+                  )}
+                </button>
+
+                <AnimatePresence>
+                  {isCategoryOpen && isHost && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute left-0 right-0 top-full mt-2 bg-[#0b0f19] border border-white/10 rounded-2xl p-2 shadow-2xl z-[100] flex flex-col gap-1"
+                    >
+                      {categoriesList.map((cat) => (
+                        <button
+                          key={cat.id}
+                          onClick={() => handleCategorySelect(cat.id)}
+                          className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-black transition-all cursor-pointer ${
+                            category === cat.id
+                              ? "bg-[var(--accent-color)] text-black shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                              : "text-white/70 hover:text-white hover:bg-white/5"
+                          }`}
+                        >
+                          {cat.label}
+                          {category === cat.id && (
+                            <div className="w-2 h-2 rounded-full bg-black/50" />
+                          )}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               <div className="text-sm font-bold text-white/80 pt-2">
-                Difficoltà
+                {t("lobby.difficultyDesc")}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {difficulties.map((diff) => {

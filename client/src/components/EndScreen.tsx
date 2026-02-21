@@ -96,7 +96,7 @@ export default function EndScreen({ results, onPlayAgain }: EndScreenProps) {
                 className="sm:flex-none w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-3 transition-colors cursor-pointer text-sm uppercase tracking-widest"
               >
                 <Home size={20} />
-                <span className="hidden sm:inline">Esci</span>
+                <span className="hidden sm:inline">{t("end.exit")}</span>
                 <span className="sm:hidden text-xs">
                   {t("end.backToLobby")}
                 </span>

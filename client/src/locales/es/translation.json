@@ -20,6 +20,10 @@
   "lobby": {
     "title": "Sala",
     "code": "Código",
+    "settings": "Ajustes del Juego",
+    "onlyHostDesc": "Solo anfitrión puede editar",
+    "categoryDesc": "Categoría",
+    "difficultyDesc": "Dificultad",
     "waitingForPlayers": "Esperando jugadores...",
     "players": "Jugadores",
     "catRandom": "Mezcla Aleatoria",
@@ -37,7 +41,9 @@
     "round": "Ronda",
     "of": "de",
     "category": "Categoría",
+    "questionBadge": "Pregunta",
     "points": "pts",
+    "guessedIt": "¡ha adivinado! (+{{points}} pts)",
     "yourTurn": "¡Tu turno!",
     "turnOf": " debe responder",
     "answerPlaceholder": "Escribe tu respuesta...",
@@ -57,6 +63,7 @@
     "finalScores": "Puntuaciones Finales",
     "playAgain": "Jugar de Nuevo",
     "backToLobby": "Volver a la Sala",
+    "exit": "Salir",
     "points": "puntos",
     "tie": "¡Empate!"
   },

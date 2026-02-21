@@ -164,7 +164,7 @@ export default function Game({ gameState, onGameEnd }: GameProps) {
           className="bg-[#111] border border-white/10 rounded-3xl p-6 md:p-8 mb-6 relative shadow-2xl"
         >
           <div className="absolute -top-3 left-8 bg-[var(--accent-color)] text-[#111] text-[10px] uppercase font-black tracking-widest px-3 py-1 rounded-full">
-            Domanda
+            {t("game.questionBadge")}
           </div>
           <p className="text-xl md:text-2xl font-medium text-white leading-relaxed">
             {gameState.questionText}
@@ -203,7 +203,8 @@ export default function Game({ gameState, onGameEnd }: GameProps) {
             >
               <CheckCircle2 size={40} className="text-green-400 mx-auto mb-3" />
               <p className="text-green-400 text-lg font-bold">
-                {feedback.playerName} ha indovinato! (+{feedback.points} pti)
+                {feedback.playerName}{" "}
+                {t("game.guessedIt", { points: feedback.points })}
               </p>
               <p className="text-green-300/70 text-sm mt-2 font-medium">
                 {feedback.answer}
@@ -263,7 +264,7 @@ export default function Game({ gameState, onGameEnd }: GameProps) {
               onKeyDown={handleKeyDown}
               disabled={!isMyTurn || !!feedback || !!revealAnswer}
               placeholder={isMyTurn ? t("game.answerPlaceholder") : ""}
-              className={`flex-1 bg-black/40 border rounded-2xl px-5 py-4 text-white text-lg placeholder-white/20 focus:outline-none transition-all
+              className={`flex-1 min-w-0 bg-black/40 border rounded-2xl px-4 py-3 md:px-5 md:py-4 text-white text-base md:text-lg placeholder-white/20 focus:outline-none transition-all
                 ${isMyTurn ? "border-[var(--accent-color)]/30 focus:border-[var(--accent-color)] shadow-inner" : "border-white/5 cursor-not-allowed"}
                 ${feedback?.type === "wrong" ? "border-red-500/50 bg-red-500/10 text-red-100 animate-[shake_0.5s_ease-in-out]" : ""}
               `}
@@ -273,7 +274,7 @@ export default function Game({ gameState, onGameEnd }: GameProps) {
               disabled={
                 !isMyTurn || !answer.trim() || !!feedback || !!revealAnswer
               }
-              className="bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] disabled:bg-white/5 disabled:text-white/20 text-black px-6 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.05] disabled:hover:scale-100 flex items-center justify-center cursor-pointer shadow-lg"
+              className="bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] disabled:bg-white/5 disabled:text-white/20 text-black px-5 md:px-6 shrink-0 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.05] disabled:hover:scale-100 flex items-center justify-center cursor-pointer shadow-lg"
             >
               <Send size={24} />
             </button>
