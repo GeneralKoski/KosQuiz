@@ -157,9 +157,11 @@ export default function Lobby({
     >
       <div className="flex flex-col md:flex-row gap-8 items-stretch pt-4 md:pt-10">
         {/* Sinistra: Gestione, Codice Room e Settaggi */}
-        <div className="flex-1 w-full flex flex-col">
-          <div className="text-center md:text-left bg-[#111]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden flex-1 flex flex-col">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-[var(--accent-color)]/5 blur-[80px] rounded-full pointer-events-none" />
+        <div className="flex-1 w-full flex flex-col relative z-20">
+          <div className="text-center md:text-left bg-[#111]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative flex-1 flex flex-col">
+            <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-[var(--accent-color)]/5 blur-[80px] rounded-full" />
+            </div>
 
             <h2 className="text-3xl md:text-5xl font-black text-white mb-6">
               {t("lobby.title")}
@@ -214,7 +216,7 @@ export default function Lobby({
               <div className="text-sm font-bold text-white/80">
                 {t("lobby.categoryDesc")}
               </div>
-              <div className="relative" ref={dropdownRef}>
+              <div className="relative z-50" ref={dropdownRef}>
                 <button
                   onClick={() => isHost && setIsCategoryOpen(!isCategoryOpen)}
                   className={`w-full flex items-center justify-between bg-[#0b0f19] border rounded-2xl px-5 py-4 text-sm font-black text-white/80 transition-all ${isCategoryOpen ? "border-[var(--accent-color)]/50 ring-1 ring-[var(--accent-color)]/30" : "border-white/5 hover:bg-white/5"} ${!isHost ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
