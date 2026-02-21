@@ -84,7 +84,16 @@ function lobbyInfo(lobby) {
 }
 
 function buildGameState(lobby, difficulty) {
-  const selectedRounds = shuffleArray(roundsDb).slice(0, 5);
+  let pool = roundsDb;
+  if (lobby.category && lobby.category !== "random") {
+    // try to match english name natively used as id
+    pool = roundsDb.filter(
+      (r) => r.category.en.toLowerCase() === lobby.category.toLowerCase(),
+    );
+    if (pool.length < 5) pool = roundsDb; // fallback to all if a category doesn't have enough queries
+  }
+
+  const selectedRounds = shuffleArray(pool).slice(0, 5);
   const roundsState = selectedRounds.map((r) => ({
     ...r,
     selectedHints: {
@@ -164,7 +173,7 @@ function emitGameState(lobby) {
       activePlayerName:
         lobby.players.find((p) => p.id === activePlayerId)?.name || "?",
       phase: game.phase,
-      hintText: getCurrentHint(game, lang),
+      hintText: game.currentQuestion >= 2 ? getCurrentHint(game, lang) : null,
       players: lobby.players.map((p) => ({
         id: p.id,
         name: p.name,
@@ -492,16 +501,13 @@ io.on("connection", (socket) => {
       game.turnOrder = game.turnOrder.filter((id) => id !== socket.id);
 
       if (game.turnOrder.length < 2) {
-        lobby.state = "finished";
-        game.phase = "gameEnd";
+        lobby.state = "waiting";
+        lobby.game = null;
         clearTurnTimer(game);
-        io.to(lobby.code).emit("game:end", {
-          players: lobby.players.map((p) => ({
-            id: p.id,
-            name: p.name,
-            score: p.score,
-          })),
+        io.to(lobby.code).emit("game:error", {
+          message: "error.notEnoughPlayers",
         });
+        io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));
       } else if (
         currentPlayerId(game) === socket.id ||
         !game.turnOrder.includes(currentPlayerId(game))

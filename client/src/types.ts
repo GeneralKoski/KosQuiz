@@ -14,6 +14,7 @@ export interface LobbyInfo {
   players: PlayerInfo[];
   state: "waiting" | "playing" | "finished";
   difficulty: Difficulty;
+  category: string;
 }
 
 export interface PublicLobby {

@@ -22,6 +22,11 @@
     "code": "Code",
     "waitingForPlayers": "Waiting for players...",
     "players": "Players",
+    "catRandom": "Random Mix",
+    "catGeography": "Geography",
+    "catScience": "Science",
+    "catHistory": "History",
+    "catCinema": "Cinema",
     "startGame": "Start Game",
     "needMorePlayers": "Need at least 2 players",
     "host": "Host",
@@ -62,6 +67,7 @@
     "nameTaken": "Name is already taken in this lobby",
     "notInLobby": "You are not in a lobby",
     "notHost": "Only the host can start",
-    "needPlayers": "Need at least 2 players"
+    "needPlayers": "Need at least 2 players",
+    "notEnoughPlayers": "All other players have left the game."
   }
 }

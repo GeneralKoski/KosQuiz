@@ -120,8 +120,8 @@ export default function Game({ gameState, onGameEnd }: GameProps) {
   // Orange to Red gradient for timer
   const timerColor =
     timeLeft > 5
-      ? "bg-gradient-to-r from-[var(--accent-color)] to-yellow-400"
-      : "bg-gradient-to-r from-red-500 to-red-600 animate-pulse";
+      ? "bg-[var(--accent-color)]"
+      : "bg-[var(--accent-hover)] animate-pulse";
 
   const sortedPlayers = [...(gameState.players || [])].sort(
     (a, b) => b.score - a.score,
@@ -135,8 +135,7 @@ export default function Game({ gameState, onGameEnd }: GameProps) {
         <div className="flex items-center gap-3 mb-6 overflow-x-auto pb-2 scrollbar-none">
           <span className="flex-shrink-0 text-xs font-bold uppercase tracking-widest text-[#111] bg-white px-3 py-1.5 rounded-full">
             {t("game.round")} {gameState.round}{" "}
-            <span className="text-white/40 mx-1">/</span>{" "}
-            {gameState.totalRounds}
+            <span className="text-[#111] mx-1">/</span> {gameState.totalRounds}
           </span>
           <span className="flex-shrink-0 text-xs font-bold uppercase tracking-widest text-[var(--accent-color)] border border-[var(--accent-color)]/30 bg-[var(--accent-color)]/10 px-3 py-1.5 rounded-full">
             {gameState.category}

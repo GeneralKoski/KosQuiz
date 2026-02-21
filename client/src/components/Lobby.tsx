@@ -26,13 +26,23 @@ export default function Lobby({ lobby }: LobbyProps) {
   const [error, setError] = useState("");
 
   const [difficulty, setDifficulty] = useState<Difficulty>("turn");
+  const [category, setCategory] = useState<string>("random");
 
-  // Sync local difficulty with server state
+  // Sync local settings with server state
   useEffect(() => {
-    if (lobby.difficulty) {
-      setDifficulty(lobby.difficulty);
-    }
-  }, [lobby.difficulty]);
+    if (lobby.difficulty) setDifficulty(lobby.difficulty);
+    if (lobby.category) setCategory(lobby.category);
+  }, [lobby.difficulty, lobby.category]);
+
+  useEffect(() => {
+    const handleGameError = ({ message }: { message: string }) => {
+      setError(t(message));
+    };
+    socket.on("game:error", handleGameError);
+    return () => {
+      socket.off("game:error", handleGameError);
+    };
+  }, [t]);
 
   const isHost = lobby.hostId === socket.id;
   const canStart = lobby.players.length >= 2;
@@ -58,6 +68,20 @@ export default function Lobby({ lobby }: LobbyProps) {
     setDifficulty(newDiff);
     socket.emit("lobby:updateSettings", { difficulty: newDiff });
   };
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (!isHost) return;
+    setCategory(e.target.value);
+    socket.emit("lobby:updateSettings", { category: e.target.value });
+  };
+
+  const categoriesList = [
+    { id: "random", label: t("lobby.catRandom", "Mix Casuale") },
+    { id: "Geography", label: t("lobby.catGeography", "Geografia") },
+    { id: "Science", label: t("lobby.catScience", "Scienza") },
+    { id: "History", label: t("lobby.catHistory", "Storia") },
+    { id: "Cinema", label: t("lobby.catCinema", "Cinema") },
+  ];
 
   // Difficulty configs for UI
   const difficulties: {
@@ -154,7 +178,28 @@ export default function Lobby({ lobby }: LobbyProps) {
             </h3>
 
             <div className="space-y-4">
-              <div className="text-sm font-bold text-white/80">Difficoltà</div>
+              <div className="text-sm font-bold text-white/80">Categoria</div>
+              <div className="relative">
+                <select
+                  value={category}
+                  onChange={handleCategoryChange}
+                  disabled={!isHost}
+                  className="w-full bg-[#0b0f19] border border-white/5 rounded-2xl px-5 py-4 text-sm font-black text-white/80 focus:outline-none focus:border-[var(--accent-color)]/30 focus:ring-1 focus:ring-[var(--accent-color)]/30 appearance-none transition-all hover:bg-white/5 data-[disabled=true]:opacity-50 mb-2 disabled:cursor-not-allowed"
+                >
+                  {categoriesList.map((cat) => (
+                    <option key={cat.id} value={cat.id} className="bg-[#111]">
+                      {cat.label}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute top-1/2 right-4 -translate-y-1/2 pointer-events-none text-white/30">
+                  <Settings2 size={16} />
+                </div>
+              </div>
+
+              <div className="text-sm font-bold text-white/80 pt-2">
+                Difficoltà
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 {difficulties.map((diff) => {
                   const Icon = diff.icon;

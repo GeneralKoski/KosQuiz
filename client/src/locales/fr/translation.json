@@ -22,7 +22,12 @@
     "code": "Code",
     "waitingForPlayers": "En attente de joueurs...",
     "players": "Joueurs",
-    "startGame": "Lancer la Partie",
+    "catRandom": "Mélange Aléatoire",
+    "catGeography": "Géographie",
+    "catScience": "Science",
+    "catHistory": "Histoire",
+    "catCinema": "Cinéma",
+    "startGame": "Commencer la Partie",
     "needMorePlayers": "Il faut au moins 2 joueurs",
     "host": "Hôte",
     "you": "Vous",
@@ -59,9 +64,10 @@
     "nameRequired": "Le nom est requis",
     "lobbyNotFound": "Salon introuvable",
     "gameInProgress": "La partie a déjà commencé",
-    "nameTaken": "Ce nom est déjà pris dans ce salon",
+    "nameTaken": "Ce nom est déjà utilisé dans ce salon",
     "notInLobby": "Vous n'êtes pas dans un salon",
-    "notHost": "Seul l'hôte peut lancer la partie",
-    "needPlayers": "Il faut au moins 2 joueurs"
+    "notHost": "Seul l'hôte peut commencer",
+    "needPlayers": "Besoin d'au moins 2 joueurs",
+    "notEnoughPlayers": "Tous les autres joueurs ont quitté la partie."
   }
 }

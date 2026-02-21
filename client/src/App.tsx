@@ -34,14 +34,22 @@ export default function App() {
       setEndResults(null);
     };
 
+    const handleGameError = () => {
+      setScreen("lobby");
+      setGameState(null);
+      setEndResults(null);
+    };
+
     socket.on("lobby:updated", handleLobbyUpdated);
     socket.on("game:state", handleGameState);
     socket.on("game:reset", handleGameReset);
+    socket.on("game:error", handleGameError);
 
     return () => {
       socket.off("lobby:updated", handleLobbyUpdated);
       socket.off("game:state", handleGameState);
       socket.off("game:reset", handleGameReset);
+      socket.off("game:error", handleGameError);
     };
   }, [screen]);
 
