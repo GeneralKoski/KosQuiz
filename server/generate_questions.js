@@ -19,10 +19,10 @@ const PROMPT_TEMPLATE = `
 Generate 5 trivia questions for a multiplayer quiz game.
 The category is: "{category}".
 
-The output MUST be a valid JSON array of objects, exactly matching this schema.
-Do NOT include any markdown formatting, do NOT wrap in \`\`\`json. Return ONLY raw JSON.
+The output MUST be a valid JSON object with a single key "questions" containing an array of 5 exact objects matching this schema.
+Do NOT include any markdown formatting or extra text. Return ONLY raw JSON.
 
-Schema per object:
+Schema per object in the "questions" array:
 {
   "category": {
     "en": "Category Name in English",
@@ -91,8 +91,8 @@ Schema per object:
 
 Important rules:
 1. "answer" must be extremely short (1-3 words max).
-2. "easy.hints[0]" should ALWAYS be a hangman-style fill-in-the-blank of the answer (e.g. "P A _ _ S" for "PARIS"). It should reveal at least 30-40% of the letters.
-3. Output a pure JSON array containing exactly 5 of these objects.
+2. "easy.hints[0]" should ALWAYS be a hangman-style fill-in-the-blank of the answer. It should reveal at least 30-40% of the letters.
+3. The root of the JSON MUST be an object like { "questions": [...] }.
 4. Ensure all translations are accurate.
 5. Provide obscure, unique questions. Avoid common cliches (e.g. NO "Capital of France", NO "Author of Hamlet").
 `;
@@ -120,17 +120,14 @@ async function generateBatch(category) {
           content: PROMPT_TEMPLATE.replace("{category}", category),
         },
       ],
-      model: "llama3-8b-8192", // Modello più piccolo ed economico per i tokens
+      model: "llama-3.1-8b-instant", // Modello più piccolo ed economico per i tokens
       temperature: 0.9,
+      response_format: { type: "json_object" },
     });
 
     const responseText = chatCompletion.choices[0]?.message?.content || "";
-    const cleanJson = responseText
-      .replace(/```json/g, "")
-      .replace(/```/g, "")
-      .trim();
-
-    const questions = JSON.parse(cleanJson);
+    const parsedData = JSON.parse(responseText);
+    const questions = parsedData.questions;
 
     if (!Array.isArray(questions)) throw new Error("Not an array");
 
