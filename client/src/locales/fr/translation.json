@@ -2,7 +2,7 @@
   "appName": "KosQuiz",
   "landing": {
     "title": "Bienvenue sur KosQuiz",
-    "subtitle": "Quiz multijoueur en temps réel",
+    "subtitle": "Quiz multijoueur",
     "namePlaceholder": "Entrez votre nom",
     "language": "Langue",
     "createLobby": "Créer un Salon",
@@ -54,5 +54,14 @@
     "backToLobby": "Retour au Salon",
     "points": "points",
     "tie": "Égalité !"
+  },
+  "error": {
+    "nameRequired": "Le nom est requis",
+    "lobbyNotFound": "Salon introuvable",
+    "gameInProgress": "La partie a déjà commencé",
+    "nameTaken": "Ce nom est déjà pris dans ce salon",
+    "notInLobby": "Vous n'êtes pas dans un salon",
+    "notHost": "Seul l'hôte peut lancer la partie",
+    "needPlayers": "Il faut au moins 2 joueurs"
   }
 }

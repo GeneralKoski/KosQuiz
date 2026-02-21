@@ -2,7 +2,7 @@
   "appName": "KosQuiz",
   "landing": {
     "title": "Benvenuto su KosQuiz",
-    "subtitle": "Quiz multiplayer in tempo reale",
+    "subtitle": "Quiz multiplayer",
     "namePlaceholder": "Inserisci il tuo nome",
     "language": "Lingua",
     "createLobby": "Crea Lobby",
@@ -54,5 +54,14 @@
     "backToLobby": "Torna alla Lobby",
     "points": "punti",
     "tie": "Pareggio!"
+  },
+  "error": {
+    "nameRequired": "Il nome è obbligatorio",
+    "lobbyNotFound": "Lobby non trovata",
+    "gameInProgress": "La partita è già in corso",
+    "nameTaken": "Questo nome è già in uso in questa lobby",
+    "notInLobby": "Non sei in una lobby",
+    "notHost": "Solo l'host può avviare la partita",
+    "needPlayers": "Servono almeno 2 giocatori per iniziare"
   }
 }

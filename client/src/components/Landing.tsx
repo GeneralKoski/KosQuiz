@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import socket from '../socket';
-import type { LobbyInfo, PublicLobby } from '../types';
+import { AnimatePresence, motion } from "framer-motion";
+import { Play, Plus, Search, Users, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import socket from "../socket";
+import type { LobbyInfo, PublicLobby } from "../types";
 
 interface LandingProps {
   onJoinLobby: (lobby: LobbyInfo, name: string) => void;
@@ -9,153 +11,258 @@ interface LandingProps {
 
 export default function Landing({ onJoinLobby }: LandingProps) {
   const { t, i18n } = useTranslation();
-  const [name, setName] = useState('');
-  const [code, setCode] = useState('');
+  const [name, setName] = useState("");
+  const [code, setCode] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [publicLobbies, setPublicLobbies] = useState<PublicLobby[]>([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+
+  // Controls what modal is shown
+  const [view, setView] = useState<"list" | "create" | "join">("list");
 
   useEffect(() => {
-    socket.emit('lobby:list', (lobbies: PublicLobby[]) => {
+    socket.emit("lobby:list", (lobbies: PublicLobby[]) => {
       setPublicLobbies(lobbies || []);
     });
 
-    const handleUpdate = (lobbies: PublicLobby[]) => setPublicLobbies(lobbies || []);
-    socket.on('lobbies:update', handleUpdate);
-    return () => { socket.off('lobbies:update', handleUpdate); };
+    const handleUpdate = (lobbies: PublicLobby[]) =>
+      setPublicLobbies(lobbies || []);
+    socket.on("lobbies:update", handleUpdate);
+    return () => {
+      socket.off("lobbies:update", handleUpdate);
+    };
   }, []);
 
-  const handleCreate = () => {
-    if (!name.trim()) return setError(t('landing.namePlaceholder'));
-    setError('');
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return setError(t("error.nameRequired"));
+    setError("");
     socket.emit(
-      'lobby:create',
+      "lobby:create",
       { name: name.trim(), lang: i18n.language, isPublic },
       (res: { error?: string; lobby?: LobbyInfo }) => {
-        if (res.error) return setError(res.error);
+        if (res.error) return setError(t(res.error));
         onJoinLobby(res.lobby!, name.trim());
       },
     );
   };
 
-  const handleJoin = (lobbyCode: string) => {
-    if (!name.trim()) return setError(t('landing.namePlaceholder'));
-    setError('');
+  const handleJoin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return setError(t("error.nameRequired"));
+    if (!code.trim()) return setError(t("error.lobbyNotFound"));
+    setError("");
     socket.emit(
-      'lobby:join',
-      { name: name.trim(), lang: i18n.language, code: lobbyCode },
+      "lobby:join",
+      { name: name.trim(), lang: i18n.language, code: code.toUpperCase() },
       (res: { error?: string; lobby?: LobbyInfo }) => {
-        if (res.error) return setError(res.error);
+        if (res.error) return setError(t(res.error));
         onJoinLobby(res.lobby!, name.trim());
       },
     );
+  };
+
+  const openJoinModal = (lobbyCode?: string) => {
+    if (lobbyCode) setCode(lobbyCode);
+    setError("");
+    setView("join");
+  };
+
+  const openCreateModal = () => {
+    setError("");
+    setView("create");
   };
 
   return (
-    <div className="max-w-md mx-auto px-4">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-white mb-1">{t('landing.title')}</h1>
-        <p className="text-slate-400 text-sm">{t('landing.subtitle')}</p>
-      </div>
-
-      {error && (
-        <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-3 py-2 rounded mb-4">
-          {error}
-        </div>
-      )}
-
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder={t('landing.namePlaceholder')}
-        maxLength={20}
-        className="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 mb-4"
-      />
-
-      {/* Create lobby */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded p-4 mb-4">
-        <div className="flex items-center gap-3 mb-3">
-          <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
-            <input
-              type="radio"
-              checked={isPublic}
-              onChange={() => setIsPublic(true)}
-              className="accent-indigo-500"
-            />
-            {t('landing.publicLobby')}
-          </label>
-          <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
-            <input
-              type="radio"
-              checked={!isPublic}
-              onChange={() => setIsPublic(false)}
-              className="accent-indigo-500"
-            />
-            {t('landing.privateLobby')}
-          </label>
-        </div>
-        <button
-          onClick={handleCreate}
-          className="w-full bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium py-2 rounded transition-colors cursor-pointer"
-        >
-          {t('landing.createLobby')}
-        </button>
-      </div>
-
-      {/* Join by code */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded p-4 mb-4">
-        <p className="text-sm text-slate-400 mb-2">{t('landing.lobbyCode')}</p>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={code}
-            onChange={(e) => setCode(e.target.value.toUpperCase())}
-            placeholder={t('landing.codePlaceholder')}
-            maxLength={6}
-            className="flex-1 bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white placeholder-slate-500 text-sm font-mono tracking-widest focus:outline-none focus:border-indigo-500 uppercase"
-          />
-          <button
-            onClick={() => handleJoin(code)}
-            className="bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded transition-colors cursor-pointer"
-          >
-            {t('landing.join')}
-          </button>
-        </div>
-      </div>
-
-      {/* Public lobbies */}
-      <div>
-        <h2 className="text-sm font-medium text-slate-400 mb-2">{t('landing.publicLobbies')}</h2>
-        {publicLobbies.length === 0 ? (
-          <p className="text-xs text-slate-500">{t('landing.noPublicLobbies')}</p>
-        ) : (
-          <div className="space-y-2">
-            {publicLobbies.map((lobby) => (
-              <div
-                key={lobby.code}
-                className="flex items-center justify-between bg-slate-800/50 border border-slate-700 rounded px-3 py-2"
-              >
-                <div>
-                  <span className="text-sm text-white font-mono">{lobby.code}</span>
-                  <span className="text-xs text-slate-500 ml-2">
-                    {t('landing.hostedBy')}: {lobby.hostName}
-                  </span>
-                  <span className="text-xs text-slate-500 ml-2">
-                    {lobby.playerCount} {t('landing.players')}
-                  </span>
-                </div>
-                <button
-                  onClick={() => handleJoin(lobby.code)}
-                  className="bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-xs px-3 py-1 rounded transition-colors cursor-pointer"
-                >
-                  {t('landing.join')}
-                </button>
-              </div>
-            ))}
+    <div className="w-full max-w-5xl mx-auto px-4 relative">
+      <div className="flex flex-col md:flex-row gap-12 items-center md:items-start pt-4 md:pt-12">
+        {/* Colonne di sinistra: Testo e Call to Actions */}
+        <div className="flex-1 w-full text-center md:text-left">
+          <div className="mb-10">
+            <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white mb-4 tracking-tight leading-none text-transparent bg-clip-text bg-gradient-to-br from-white to-white/50">
+              {t("landing.title")}
+            </h1>
+            <p className="text-white/50 text-base md:text-lg tracking-wide max-w-sm mx-auto md:mx-0">
+              {t("landing.subtitle")}
+            </p>
           </div>
-        )}
+
+          <div className="flex flex-col sm:flex-row gap-4 mb-8">
+            <button
+              onClick={openCreateModal}
+              className="flex-1 bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-black font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all hover:scale-105 cursor-pointer shadow-[0_0_30px_rgba(59,130,246,0.3)] hover:shadow-[0_0_40px_rgba(59,130,246,0.5)]"
+            >
+              <Plus size={24} />
+              <span className="text-lg">{t("landing.createLobby")}</span>
+            </button>
+            <button
+              onClick={() => openJoinModal()}
+              className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all hover:scale-105 cursor-pointer backdrop-blur-sm"
+            >
+              <Search size={24} />
+              <span className="text-lg">{t("landing.joinLobby")}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Colonna di destra: Lobbies */}
+        <div className="flex-1 w-full w-full max-w-md mx-auto md:max-w-none">
+          <div className="bg-[#111]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-8 min-h-[300px] shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--accent-color)]/10 blur-[100px] rounded-full pointer-events-none" />
+
+            <h2 className="text-sm font-bold text-white/50 mb-6 uppercase tracking-wider flex items-center gap-2">
+              <Users size={18} />
+              {t("landing.publicLobbies")}
+            </h2>
+
+            {publicLobbies.length === 0 ? (
+              <div className="text-center py-16 bg-white/5 rounded-2xl border border-white/5 border-dashed">
+                <p className="text-sm text-white/40">
+                  {t("landing.noPublicLobbies")}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <AnimatePresence>
+                  {publicLobbies.map((lobby) => (
+                    <motion.div
+                      key={lobby.code}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      className="group flex items-center justify-between bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl px-5 py-4 transition-colors"
+                    >
+                      <div>
+                        <div className="flex items-center gap-3 mb-1">
+                          <span className="text-xl text-[var(--accent-color)] font-black tracking-widest">
+                            {lobby.code}
+                          </span>
+                          <span className="text-[10px] font-bold text-white/50 bg-white/5 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            {lobby.playerCount} {t("landing.players")}
+                          </span>
+                        </div>
+                        <div className="text-xs text-white/50">
+                          {t("landing.hostedBy")}:{" "}
+                          <span className="text-white/80 font-medium">
+                            {lobby.hostName}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => openJoinModal(lobby.code)}
+                        className="w-12 h-12 rounded-xl bg-[var(--accent-color)]/10 text-[var(--accent-color)] flex items-center justify-center hover:bg-[var(--accent-color)] hover:text-black transition-colors cursor-pointer"
+                      >
+                        <Play size={20} className="ml-1" />
+                      </button>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
+
+      <AnimatePresence>
+        {view !== "list" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-md"
+          >
+            <div className="bg-[#0b0f19] border border-white/10 w-full max-w-sm rounded-3xl p-8 relative shadow-2xl">
+              <button
+                onClick={() => setView("list")}
+                className="absolute top-6 right-6 text-white/30 hover:text-white transition-colors cursor-pointer"
+              >
+                <X size={24} />
+              </button>
+
+              <h2 className="text-3xl font-black text-white mb-8">
+                {view === "create"
+                  ? t("landing.createLobby")
+                  : t("landing.joinLobby")}
+              </h2>
+
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="w-full bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-4 rounded-2xl mb-6 text-center shadow-[0_0_15px_rgba(239,68,68,0.1)]"
+                >
+                  <span className="font-bold tracking-wide">{error}</span>
+                </motion.div>
+              )}
+
+              <form onSubmit={view === "create" ? handleCreate : handleJoin}>
+                <div className="mb-5">
+                  <label className="block text-xs font-bold text-white/50 mb-2 uppercase tracking-wide">
+                    {t("landing.namePlaceholder")}
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Es. Mario"
+                    maxLength={15}
+                    className="w-full bg-[#111] border border-white/10 rounded-2xl px-5 py-4 text-white placeholder-white/30 text-base font-medium focus:outline-none focus:border-[var(--accent-color)] focus:ring-1 focus:ring-[var(--accent-color)] transition-all"
+                    autoFocus
+                  />
+                </div>
+
+                {view === "join" && (
+                  <div className="mb-8">
+                    <label className="block text-xs font-bold text-white/50 mb-2 uppercase tracking-wide">
+                      {t("landing.lobbyCode")}
+                    </label>
+                    <input
+                      type="text"
+                      value={code}
+                      onChange={(e) => setCode(e.target.value.toUpperCase())}
+                      placeholder={t("landing.codePlaceholder")}
+                      maxLength={6}
+                      className="w-full bg-[#111] border border-white/10 rounded-2xl px-5 py-4 text-[var(--accent-color)] placeholder-white/20 text-xl font-black tracking-[0.3em] focus:outline-none focus:border-[var(--accent-color)] focus:ring-1 focus:ring-[var(--accent-color)] transition-all uppercase"
+                    />
+                  </div>
+                )}
+
+                {view === "create" && (
+                  <div className="flex items-center gap-6 mb-8 pt-2">
+                    <label className="flex items-center gap-2 text-sm text-white/60 cursor-pointer hover:text-white transition-colors font-medium">
+                      <input
+                        type="radio"
+                        checked={isPublic}
+                        onChange={() => setIsPublic(true)}
+                        className="accent-[var(--accent-color)] w-4 h-4"
+                      />
+                      {t("landing.publicLobby")}
+                    </label>
+                    <label className="flex items-center gap-2 text-sm text-white/60 cursor-pointer hover:text-white transition-colors font-medium">
+                      <input
+                        type="radio"
+                        checked={!isPublic}
+                        onChange={() => setIsPublic(false)}
+                        className="accent-[var(--accent-color)] w-4 h-4"
+                      />
+                      {t("landing.privateLobby")}
+                    </label>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-black text-lg font-black py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-95 cursor-pointer shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+                >
+                  {view === "create"
+                    ? t("landing.createLobby")
+                    : t("landing.join")}
+                </button>
+              </form>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

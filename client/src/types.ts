@@ -1,4 +1,5 @@
-export type Lang = 'en' | 'it' | 'fr' | 'es';
+export type Lang = "en" | "it" | "fr" | "es";
+export type Difficulty = "turn" | "easy" | "medium" | "hard";
 
 export interface PlayerInfo {
   id: string;
@@ -11,7 +12,8 @@ export interface LobbyInfo {
   isPublic: boolean;
   hostId: string;
   players: PlayerInfo[];
-  state: 'waiting' | 'playing' | 'finished';
+  state: "waiting" | "playing" | "finished";
+  difficulty: Difficulty;
 }
 
 export interface PublicLobby {
@@ -29,7 +31,7 @@ export interface GameState {
   questionIndex: number;
   activePlayerId: string;
   activePlayerName: string;
-  phase: 'question' | 'hint' | 'reveal' | 'roundEnd' | 'gameEnd';
+  phase: "question" | "hint" | "reveal" | "roundEnd" | "gameEnd";
   hintText: string | null;
   players: PlayerInfo[];
 }

@@ -1,13 +1,21 @@
-import { useState, useEffect, useRef, type KeyboardEvent } from 'react';
-import { useTranslation } from 'react-i18next';
-import socket from '../socket';
-import type { GameState, GameEndResult, CorrectFeedback, RevealData, TimerStartData } from '../types';
+import { AnimatePresence, motion } from "framer-motion";
+import { CheckCircle2, Lightbulb, Send, Timer, Trophy } from "lucide-react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useTranslation } from "react-i18next";
+import socket from "../socket";
+import type {
+  CorrectFeedback,
+  GameEndResult,
+  GameState,
+  RevealData,
+  TimerStartData,
+} from "../types";
 
 interface Feedback {
-  type: 'correct';
-  playerName: string;
-  points: number;
-  answer: string;
+  type: "correct" | "wrong";
+  playerName?: string;
+  points?: number;
+  answer?: string;
 }
 
 interface GameProps {
@@ -17,7 +25,7 @@ interface GameProps {
 
 export default function Game({ gameState, onGameEnd }: GameProps) {
   const { t } = useTranslation();
-  const [answer, setAnswer] = useState('');
+  const [answer, setAnswer] = useState("");
   const [timeLeft, setTimeLeft] = useState(15);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [revealAnswer, setRevealAnswer] = useState<string | null>(null);
@@ -31,7 +39,7 @@ export default function Game({ gameState, onGameEnd }: GameProps) {
       setTimeLeft(seconds);
       setFeedback(null);
       setRevealAnswer(null);
-      setAnswer('');
+      setAnswer("");
       if (timerRef.current) clearInterval(timerRef.current);
       const start = Date.now();
       timerRef.current = setInterval(() => {
@@ -42,13 +50,18 @@ export default function Game({ gameState, onGameEnd }: GameProps) {
       }, 50);
     };
 
-    const handleCorrect = ({ playerName, points, answer: correctAns }: CorrectFeedback) => {
+    const handleCorrect = ({
+      playerName,
+      points,
+      answer: correctAns,
+    }: CorrectFeedback) => {
       if (timerRef.current) clearInterval(timerRef.current);
-      setFeedback({ type: 'correct', playerName, points, answer: correctAns });
+      setFeedback({ type: "correct", playerName, points, answer: correctAns });
     };
 
     const handleWrong = () => {
-      // Brief flash, state update will come from server
+      setFeedback({ type: "wrong" });
+      setTimeout(() => setFeedback(null), 1000); // Shorter flash for wrong
     };
 
     const handleReveal = ({ correctAnswer }: RevealData) => {
@@ -61,154 +74,258 @@ export default function Game({ gameState, onGameEnd }: GameProps) {
       onGameEnd(data);
     };
 
-    socket.on('game:timerStart', handleTimerStart);
-    socket.on('game:correct', handleCorrect);
-    socket.on('game:wrong', handleWrong);
-    socket.on('game:reveal', handleReveal);
-    socket.on('game:end', handleEnd);
+    socket.on("game:timerStart", handleTimerStart);
+    socket.on("game:correct", handleCorrect);
+    socket.on("game:wrong", handleWrong);
+    socket.on("game:reveal", handleReveal);
+    socket.on("game:end", handleEnd);
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
-      socket.off('game:timerStart', handleTimerStart);
-      socket.off('game:correct', handleCorrect);
-      socket.off('game:wrong', handleWrong);
-      socket.off('game:reveal', handleReveal);
-      socket.off('game:end', handleEnd);
+      socket.off("game:timerStart", handleTimerStart);
+      socket.off("game:correct", handleCorrect);
+      socket.off("game:wrong", handleWrong);
+      socket.off("game:reveal", handleReveal);
+      socket.off("game:end", handleEnd);
     };
   }, [onGameEnd]);
 
   useEffect(() => {
-    if (isMyTurn && inputRef.current) {
+    if (isMyTurn && inputRef.current && !feedback && !revealAnswer) {
       inputRef.current.focus();
     }
-  }, [isMyTurn, gameState?.activePlayerId]);
+  }, [isMyTurn, gameState?.activePlayerId, feedback, revealAnswer]);
 
   if (!gameState) return null;
 
   const submit = () => {
     if (!answer.trim() || !isMyTurn) return;
-    socket.emit('game:answer', { answer: answer.trim() });
-    setAnswer('');
+    socket.emit("game:answer", { answer: answer.trim() });
+    setAnswer("");
+    // Clear input while waiting for server response
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') submit();
+    if (e.key === "Enter") submit();
   };
 
   const timerPercent = (timeLeft / 15) * 100;
-  const timerColor = timeLeft > 5 ? 'bg-indigo-500' : timeLeft > 2 ? 'bg-amber-500' : 'bg-red-500';
+  // Orange to Red gradient for timer
+  const timerColor =
+    timeLeft > 5
+      ? "bg-gradient-to-r from-[var(--accent-color)] to-yellow-400"
+      : "bg-gradient-to-r from-red-500 to-red-600 animate-pulse";
 
-  const sortedPlayers = [...(gameState.players || [])].sort((a, b) => b.score - a.score);
-
-  const questionLabel = gameState.questionIndex === 0 ? '3' : gameState.questionIndex === 1 ? '2' : '1';
+  const sortedPlayers = [...(gameState.players || [])].sort(
+    (a, b) => b.score - a.score,
+  );
 
   return (
-    <div className="max-w-4xl mx-auto px-4 flex flex-col lg:flex-row gap-4">
+    <div className="w-full max-w-5xl mx-auto px-4 flex flex-col lg:flex-row gap-6">
       {/* Main game area */}
-      <div className="flex-1 min-w-0">
-        {/* Round & category header */}
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs text-slate-400">
-            {t('game.round')} {gameState.round} {t('game.of')} {gameState.totalRounds}
+      <motion.div layout className="flex-1 min-w-0 flex flex-col">
+        {/* Header Badges */}
+        <div className="flex items-center gap-3 mb-6 overflow-x-auto pb-2 scrollbar-none">
+          <span className="flex-shrink-0 text-xs font-bold uppercase tracking-widest text-[#111] bg-white px-3 py-1.5 rounded-full">
+            {t("game.round")} {gameState.round}{" "}
+            <span className="text-white/40 mx-1">/</span>{" "}
+            {gameState.totalRounds}
           </span>
-          <span className="text-xs text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">
+          <span className="flex-shrink-0 text-xs font-bold uppercase tracking-widest text-[var(--accent-color)] border border-[var(--accent-color)]/30 bg-[var(--accent-color)]/10 px-3 py-1.5 rounded-full">
             {gameState.category}
           </span>
-          <span className="text-xs text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">
-            {questionLabel} {t('game.points')}
+          <span className="flex-shrink-0 flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-yellow-400 border border-yellow-400/30 bg-yellow-400/10 px-3 py-1.5 rounded-full">
+            <Trophy size={14} />
+            {gameState.questionPoints} {t("game.points")}
           </span>
         </div>
 
-        {/* Timer bar */}
-        <div className="w-full h-1.5 bg-slate-800 rounded-full mb-4 overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-100 ease-linear ${timerColor}`}
-            style={{ width: `${timerPercent}%` }}
+        {/* Timer */}
+        <div className="relative w-full h-3 bg-white/5 rounded-full mb-8 overflow-hidden">
+          <motion.div
+            className={`absolute top-0 left-0 h-full rounded-full ${timerColor}`}
+            initial={{ width: "100%" }}
+            animate={{ width: `${timerPercent}%` }}
+            transition={{ ease: "linear", duration: 0.1 }}
           />
         </div>
 
-        {/* Question */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded p-4 mb-4">
-          <p className="text-white text-sm leading-relaxed">{gameState.questionText}</p>
-        </div>
-
-        {/* AI Hint */}
-        {gameState.hintText && (
-          <div className="bg-indigo-500/10 border border-indigo-500/30 rounded p-3 mb-4">
-            <p className="text-xs text-indigo-400 font-medium mb-1">{t('game.aiHint')}</p>
-            <p className="text-sm text-indigo-200">{gameState.hintText}</p>
+        {/* Question Box */}
+        <motion.div
+          key={gameState.questionText}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-[#111] border border-white/10 rounded-3xl p-6 md:p-8 mb-6 relative shadow-2xl"
+        >
+          <div className="absolute -top-3 left-8 bg-[var(--accent-color)] text-[#111] text-[10px] uppercase font-black tracking-widest px-3 py-1 rounded-full">
+            Domanda
           </div>
-        )}
-
-        {/* Feedback */}
-        {feedback?.type === 'correct' && (
-          <div className="bg-green-500/10 border border-green-500/30 rounded p-3 mb-4 text-center">
-            <p className="text-green-400 text-sm font-medium">
-              {feedback.playerName} — {t('game.correct')} +{feedback.points} {t('game.points')}
-            </p>
-            <p className="text-green-300 text-xs mt-1">{feedback.answer}</p>
-          </div>
-        )}
-
-        {revealAnswer && (
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded p-3 mb-4 text-center">
-            <p className="text-amber-400 text-sm">
-              {t('game.correctAnswer')}: <span className="font-medium">{revealAnswer}</span>
-            </p>
-          </div>
-        )}
-
-        {/* Turn indicator + input */}
-        <div className="mb-2">
-          <p className={`text-xs mb-2 ${isMyTurn ? 'text-green-400 font-medium' : 'text-slate-500'}`}>
-            {isMyTurn
-              ? t('game.yourTurn')
-              : `${t('game.waiting')} ${gameState.activePlayerName} ${t('game.toAnswer')}`}
+          <p className="text-xl md:text-2xl font-medium text-white leading-relaxed">
+            {gameState.questionText}
           </p>
-          <div className="flex gap-2">
+        </motion.div>
+
+        {/* AI Hint Section */}
+        <AnimatePresence mode="popLayout">
+          {gameState.hintText && (
+            <motion.div
+              key={gameState.hintText}
+              initial={{ opacity: 0, height: 0, scale: 0.95 }}
+              animate={{ opacity: 1, height: "auto", scale: 1 }}
+              exit={{ opacity: 0, height: 0, scale: 0.95 }}
+              className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-5 mb-6 relative overflow-hidden"
+            >
+              <div className="flex items-center gap-2 text-xs font-bold text-purple-400 uppercase tracking-widest mb-2">
+                <Lightbulb size={16} />
+                {t("game.aiHint")}
+              </div>
+              <p className="text-purple-200/90 text-[15px] leading-relaxed relative z-10">
+                {gameState.hintText}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Feedback Section */}
+        <AnimatePresence mode="popLayout">
+          {feedback?.type === "correct" && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-green-500/10 border border-green-500/30 rounded-2xl p-6 mb-6 text-center shadow-[0_0_30px_rgba(34,197,94,0.1)] relative overflow-hidden"
+            >
+              <CheckCircle2 size={40} className="text-green-400 mx-auto mb-3" />
+              <p className="text-green-400 text-lg font-bold">
+                {feedback.playerName} ha indovinato! (+{feedback.points} pti)
+              </p>
+              <p className="text-green-300/70 text-sm mt-2 font-medium">
+                {feedback.answer}
+              </p>
+            </motion.div>
+          )}
+
+          {revealAnswer && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-6 mb-6 text-center"
+            >
+              <p className="text-yellow-500/70 text-sm font-bold uppercase tracking-widest mb-2">
+                {t("game.correctAnswer")}
+              </p>
+              <p className="text-yellow-400 text-3xl font-black">
+                {revealAnswer}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="mt-auto"></div>
+
+        {/* Turn indicator + input area */}
+        <motion.div
+          animate={isMyTurn ? { y: 0, opacity: 1 } : { y: 0, opacity: 0.8 }}
+          className={`mt-4 p-5 rounded-3xl border transition-colors duration-300 ${
+            isMyTurn
+              ? "bg-[var(--accent-color)]/5 border-[var(--accent-color)]/30 ring-1 ring-[var(--accent-color)]/20 shadow-[0_0_30px_rgba(249,115,22,0.1)]"
+              : "bg-white/5 border-white/5"
+          }`}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            {isMyTurn ? (
+              <div className="flex items-center gap-2 text-[var(--accent-color)] font-bold uppercase tracking-widest text-sm">
+                <Timer size={18} className="animate-pulse" />
+                {t("game.yourTurn")}
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-white/50 font-bold uppercase tracking-widest text-sm">
+                <Users size={18} />
+                {t("game.waiting")}{" "}
+                <span className="text-white">{gameState.activePlayerName}</span>{" "}
+                {t("game.toAnswer")}
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-3">
             <input
               ref={inputRef}
               type="text"
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               onKeyDown={handleKeyDown}
-              disabled={!isMyTurn}
-              placeholder={isMyTurn ? t('game.answerPlaceholder') : ''}
-              className="flex-1 bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-indigo-500 disabled:opacity-40"
+              disabled={!isMyTurn || !!feedback || !!revealAnswer}
+              placeholder={isMyTurn ? t("game.answerPlaceholder") : ""}
+              className={`flex-1 bg-black/40 border rounded-2xl px-5 py-4 text-white text-lg placeholder-white/20 focus:outline-none transition-all
+                ${isMyTurn ? "border-[var(--accent-color)]/30 focus:border-[var(--accent-color)] shadow-inner" : "border-white/5 cursor-not-allowed"}
+                ${feedback?.type === "wrong" ? "border-red-500/50 bg-red-500/10 text-red-100 animate-[shake_0.5s_ease-in-out]" : ""}
+              `}
             />
             <button
               onClick={submit}
-              disabled={!isMyTurn || !answer.trim()}
-              className="bg-indigo-500 hover:bg-indigo-600 disabled:bg-slate-700 disabled:text-slate-500 text-white text-sm font-medium px-4 py-2 rounded transition-colors cursor-pointer disabled:cursor-not-allowed"
+              disabled={
+                !isMyTurn || !answer.trim() || !!feedback || !!revealAnswer
+              }
+              className="bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] disabled:bg-white/5 disabled:text-white/20 text-black px-6 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.05] disabled:hover:scale-100 flex items-center justify-center cursor-pointer shadow-lg"
             >
-              {t('game.submit')}
+              <Send size={24} />
             </button>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Sidebar leaderboard */}
-      <div className="lg:w-48 shrink-0">
-        <div className="bg-slate-800/50 border border-slate-700 rounded p-3">
-          <h3 className="text-xs text-slate-400 uppercase mb-2">{t('game.leaderboard')}</h3>
-          <div className="space-y-1.5">
-            {sortedPlayers.map((p, i) => (
-              <div
-                key={p.id}
-                className={`flex items-center justify-between text-sm ${
-                  p.id === socket.id ? 'text-indigo-400' : 'text-slate-300'
-                }`}
-              >
-                <span className="truncate">
-                  <span className="text-slate-500 text-xs mr-1.5">{i + 1}.</span>
-                  {p.name}
-                </span>
-                <span className="font-mono text-xs ml-2">{p.score}</span>
-              </div>
-            ))}
+      <motion.div layout className="lg:w-72 shrink-0">
+        <div className="bg-[#111] border border-white/5 rounded-3xl p-5 sticky top-6">
+          <h3 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+            <Trophy size={14} />
+            {t("game.leaderboard")}
+          </h3>
+          <div className="space-y-2">
+            <AnimatePresence>
+              {sortedPlayers.map((p, i) => (
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  key={p.id}
+                  className={`flex items-center justify-between p-3 rounded-xl border transition-colors ${
+                    p.id === socket.id
+                      ? "bg-[var(--accent-color)]/10 border-[var(--accent-color)]/20"
+                      : "bg-white/5 border-transparent"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`text-xs font-black ${i === 0 ? "text-yellow-400" : "text-white/30"}`}
+                    >
+                      {i + 1}
+                    </span>
+                    <span
+                      className={`font-medium ${p.id === socket.id ? "text-[var(--accent-color)]" : "text-white/80"}`}
+                    >
+                      {p.name}
+                    </span>
+                  </div>
+                  <span className="font-mono text-sm font-bold tracking-tight text-white/50">
+                    <span className="text-white mr-1">{p.score}</span>pt
+                  </span>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
         </div>
-      </div>
+      </motion.div>
+
+      {/* Keyframes for shake animation on wrong answer */}
+      <style>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          20%, 60% { transform: translateX(-5px); }
+          40%, 80% { transform: translateX(5px); }
+        }
+      `}</style>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import express from "express";
 import Groq from "groq-sdk";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import rounds from "./questions.js";
+import roundsDb from "./questions.js";
 
 const app = express();
 app.use(cors());
@@ -16,9 +16,7 @@ const io = new Server(httpServer, {
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-// ── In-memory state ──────────────────────────────────────────────
-
-const lobbies = new Map(); // code → lobby
+const lobbies = new Map();
 
 function generateCode() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -47,7 +45,8 @@ function createLobby(hostSocket, hostName, hostLang, isPublic) {
     isPublic,
     hostId: hostSocket.id,
     players: [{ id: hostSocket.id, name: hostName, lang: hostLang, score: 0 }],
-    state: "waiting", // waiting | playing | finished
+    state: "waiting",
+    difficulty: "turn", // default
     game: null,
   };
   lobbies.set(code, lobby);
@@ -80,25 +79,33 @@ function lobbyInfo(lobby) {
       score: p.score,
     })),
     state: lobby.state,
+    difficulty: lobby.difficulty,
   };
 }
 
-// ── Game logic helpers ───────────────────────────────────────────
+function buildGameState(lobby, difficulty) {
+  const selectedRounds = shuffleArray(roundsDb).slice(0, 5);
+  const roundsState = selectedRounds.map((r) => ({
+    ...r,
+    selectedHints: {
+      hard: shuffleArray(r.hard.hints),
+      medium: shuffleArray(r.medium.hints),
+      easy: shuffleArray(r.easy.hints),
+    },
+  }));
 
-function buildGameState(lobby) {
-  const selectedRounds = shuffleArray(rounds).slice(0, 5);
   return {
-    rounds: selectedRounds,
+    rounds: roundsState,
+    difficulty, // 'turn' | 'easy' | 'medium' | 'hard'
     currentRound: 0,
-    currentQuestion: 0, // 0=Q1(3pts), 1=Q2(2pts), 2=Q3(1pt)
+    currentQuestion: 0, // 0..2 (turns/hints within a round)
     turnOrder: lobby.players.map((p) => p.id),
     currentTurnIndex: 0,
-    phase: "question", // question | hint | reveal | roundEnd | gameEnd
+    phase: "question",
     hintText: null,
-    hintUsed: false,
-    rotationStart: 0, // tracks where rotation started for this question
     timer: null,
     answeredThisRotation: new Set(),
+    isCheckingAnswer: false, // Prevent race conditions during Groq calls
   };
 }
 
@@ -107,7 +114,31 @@ function currentRound(game) {
 }
 
 function currentQ(game) {
-  return currentRound(game).questions[game.currentQuestion];
+  const r = currentRound(game);
+  if (game.difficulty === "turn") {
+    if (game.currentQuestion === 0) return r.hard;
+    if (game.currentQuestion === 1) return r.medium;
+    return r.easy;
+  }
+  return r[game.difficulty];
+}
+
+function getCurrentHint(game, lang) {
+  const r = currentRound(game);
+  let diff;
+  let hintIdx = game.currentQuestion;
+
+  if (game.difficulty === "turn") {
+    if (game.currentQuestion === 0) diff = "hard";
+    else if (game.currentQuestion === 1) diff = "medium";
+    else diff = "easy";
+    hintIdx = 0; // Just use the first shuffled hint for that difficulty
+  } else {
+    diff = game.difficulty;
+  }
+
+  const hintObj = r.selectedHints[diff][hintIdx];
+  return hintObj[lang] || hintObj.en;
 }
 
 function currentPlayerId(game) {
@@ -126,14 +157,14 @@ function emitGameState(lobby) {
       round: game.currentRound + 1,
       totalRounds: game.rounds.length,
       category: round.category[lang] || round.category.en,
-      questionText: question.text[lang] || question.text.en,
+      questionText: question.question[lang] || question.question.en,
       questionPoints: question.points,
       questionIndex: game.currentQuestion,
       activePlayerId,
       activePlayerName:
         lobby.players.find((p) => p.id === activePlayerId)?.name || "?",
       phase: game.phase,
-      hintText: game.hintText,
+      hintText: getCurrentHint(game, lang),
       players: lobby.players.map((p) => ({
         id: p.id,
         name: p.name,
@@ -146,8 +177,8 @@ function emitGameState(lobby) {
 function emitReveal(lobby) {
   for (const player of lobby.players) {
     const lang = player.lang || "en";
-    const q = currentQ(lobby.game);
-    const answer = q.answer[lang] || q.answer.en;
+    const r = currentRound(lobby.game);
+    const answer = r.answer[lang] || r.answer.en;
     io.to(player.id).emit("game:reveal", { correctAnswer: answer });
   }
 }
@@ -166,8 +197,7 @@ function startTurnTimer(lobby) {
   io.to(lobby.code).emit("game:timerStart", { seconds: 15 });
 
   game.timer = setTimeout(() => {
-    // Time's up — skip this player's turn
-    handleTurnEnd(lobby, null);
+    if (!game.isCheckingAnswer) handleTurnEnd(lobby, null);
   }, 15000);
 }
 
@@ -176,12 +206,10 @@ function advanceTurn(lobby) {
   game.currentTurnIndex++;
   game.answeredThisRotation.add(currentPlayerId(game));
 
-  // Check if we've completed a full rotation
   const totalPlayers = game.turnOrder.length;
   const answersInRotation = game.answeredThisRotation.size;
 
   if (answersInRotation >= totalPlayers) {
-    // Full rotation done, nobody got it right
     handleRotationEnd(lobby);
   } else {
     emitGameState(lobby);
@@ -194,45 +222,10 @@ async function handleRotationEnd(lobby) {
   game.answeredThisRotation = new Set();
 
   if (game.currentQuestion < 2) {
-    // Move to next question (easier, fewer points)
     game.currentQuestion++;
-    game.hintText = null;
-    game.hintUsed = false;
-    game.phase = "question";
-    emitGameState(lobby);
-    startTurnTimer(lobby);
-  } else if (!game.hintUsed) {
-    // We're on Q3 and haven't used hint yet — get AI hint
-    game.hintUsed = true;
-    game.phase = "hint";
-    clearTurnTimer(game);
-
-    const answer = currentQ(game).answer.en;
-    let hint = "Think carefully about the clues given so far.";
-
-    try {
-      const chatCompletion = await groq.chat.completions.create({
-        messages: [
-          {
-            role: "user",
-            content: `The answer is "${answer}". Give a subtle but helpful additional clue for a quiz game without revealing the answer directly. Keep it to one sentence.`,
-          },
-        ],
-        model: "llama-3.3-70b-versatile",
-        temperature: 0.7,
-        max_tokens: 100,
-      });
-      hint = chatCompletion.choices[0]?.message?.content || hint;
-    } catch (err) {
-      console.error("Groq API error:", err.message);
-    }
-
-    game.hintText = hint;
-    game.phase = "question";
     emitGameState(lobby);
     startTurnTimer(lobby);
   } else {
-    // Q3 with hint already used and still nobody got it — reveal and move on
     game.phase = "reveal";
     emitReveal(lobby);
     emitGameState(lobby);
@@ -248,7 +241,6 @@ function moveToNextRound(lobby) {
   clearTurnTimer(game);
 
   if (game.currentRound + 1 >= game.rounds.length) {
-    // Game over
     game.phase = "gameEnd";
     lobby.state = "finished";
     io.to(lobby.code).emit("game:end", {
@@ -261,37 +253,87 @@ function moveToNextRound(lobby) {
   } else {
     game.currentRound++;
     game.currentQuestion = 0;
-    game.hintText = null;
-    game.hintUsed = false;
     game.phase = "question";
     game.answeredThisRotation = new Set();
-    // Rotate starting player each round
     game.currentTurnIndex = game.currentRound % game.turnOrder.length;
     emitGameState(lobby);
     startTurnTimer(lobby);
   }
 }
 
-function handleTurnEnd(lobby, answer) {
+async function checkAnswerWithAI(given, correct, questionText) {
+  const normalize = (t) =>
+    t
+      .trim()
+      .toLowerCase()
+      .replace(/[^\w\s]/g, "");
+  const gNorm = normalize(given);
+  const cNorm = normalize(correct);
+
+  if (gNorm === cNorm || (cNorm.includes(gNorm) && gNorm.length >= 4))
+    return true;
+  if (given.length < 3) return false;
+
+  try {
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: "You are a rigid quiz judge. Reply ONLY with 'YES' or 'NO'.",
+        },
+        {
+          role: "user",
+          content: `Question: "${questionText}". Official Answer: "${correct}". User Answer: "${given}". Is this acceptable as a very close minor typo, partial valid match, or direct translation? Only output YES or NO.`,
+        },
+      ],
+      model: "llama-3.3-70b-versatile",
+      temperature: 0,
+      max_tokens: 5,
+    });
+
+    const res = completion.choices[0]?.message?.content?.trim().toUpperCase();
+    return res === "YES";
+  } catch (e) {
+    console.error("Groq Check Error:", e.message);
+    return false;
+  }
+}
+
+async function handleTurnEnd(lobby, answer) {
   const game = lobby.game;
   clearTurnTimer(game);
 
   if (answer !== null) {
     const activePlayerId = currentPlayerId(game);
     const player = lobby.players.find((p) => p.id === activePlayerId);
-    const lang = player?.lang || "en";
-    const q = currentQ(game);
-    const correctAnswer = (q.answer[lang] || q.answer.en).trim().toLowerCase();
-    const given = answer.trim().toLowerCase();
+    if (!player) return advanceTurn(lobby);
 
-    if (given === correctAnswer) {
-      // Correct!
+    const lang = player.lang || "en";
+    const q = currentQ(game);
+    const r = currentRound(game);
+
+    const correctAnswer = r.answer[lang] || r.answer.en;
+    const questionText = q.question[lang] || q.question.en;
+
+    game.isCheckingAnswer = true;
+    const isCorrect = await checkAnswerWithAI(
+      answer,
+      correctAnswer,
+      questionText,
+    );
+    game.isCheckingAnswer = false;
+
+    // Check if the game is still acting on this turn (rare race condition but safe)
+    if (lobby.state !== "playing" || currentPlayerId(game) !== activePlayerId)
+      return;
+
+    if (isCorrect) {
       player.score += q.points;
       io.to(lobby.code).emit("game:correct", {
         playerId: player.id,
         playerName: player.name,
         points: q.points,
-        answer: q.answer[lang] || q.answer.en,
+        answer: correctAnswer,
       });
 
       setTimeout(() => {
@@ -305,37 +347,43 @@ function handleTurnEnd(lobby, answer) {
     }
   }
 
-  // Wrong or timeout — advance turn
   advanceTurn(lobby);
 }
-
-// ── Socket handlers ──────────────────────────────────────────────
 
 io.on("connection", (socket) => {
   let currentLobbyCode = null;
 
   socket.on("lobby:create", ({ name, lang, isPublic }, cb) => {
     if (!name || name.trim().length === 0)
-      return cb?.({ error: "Name required" });
+      return cb?.({ error: "error.nameRequired" });
     const lobby = createLobby(socket, name.trim(), lang || "en", !!isPublic);
     currentLobbyCode = lobby.code;
     cb?.({ lobby: lobbyInfo(lobby) });
     io.emit("lobbies:update", getPublicLobbies());
   });
 
+  socket.on("lobby:updateSettings", ({ difficulty }) => {
+    if (!currentLobbyCode) return;
+    const lobby = lobbies.get(currentLobbyCode);
+    if (!lobby || lobby.hostId !== socket.id) return;
+
+    if (difficulty) lobby.difficulty = difficulty;
+    io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));
+  });
+
   socket.on("lobby:join", ({ name, lang, code }, cb) => {
     if (!name || name.trim().length === 0)
-      return cb?.({ error: "Name required" });
+      return cb?.({ error: "error.nameRequired" });
     const lobby = lobbies.get(code?.toUpperCase());
-    if (!lobby) return cb?.({ error: "Lobby not found" });
+    if (!lobby) return cb?.({ error: "error.lobbyNotFound" });
     if (lobby.state !== "waiting")
-      return cb?.({ error: "Game already in progress" });
+      return cb?.({ error: "error.gameInProgress" });
     if (
       lobby.players.some(
         (p) => p.name.toLowerCase() === name.trim().toLowerCase(),
       )
     ) {
-      return cb?.({ error: "Name already taken in this lobby" });
+      return cb?.({ error: "error.nameTaken" });
     }
 
     lobby.players.push({
@@ -356,17 +404,15 @@ io.on("connection", (socket) => {
     cb?.(getPublicLobbies());
   });
 
-  socket.on("game:start", (cb) => {
-    if (!currentLobbyCode) return cb?.({ error: "Not in a lobby" });
+  socket.on("game:start", ({ difficulty = "turn" } = {}, cb) => {
+    if (!currentLobbyCode) return cb?.({ error: "error.notInLobby" });
     const lobby = lobbies.get(currentLobbyCode);
-    if (!lobby) return cb?.({ error: "Lobby not found" });
-    if (lobby.hostId !== socket.id)
-      return cb?.({ error: "Only the host can start" });
-    if (lobby.players.length < 2)
-      return cb?.({ error: "Need at least 2 players" });
+    if (!lobby) return cb?.({ error: "error.lobbyNotFound" });
+    if (lobby.hostId !== socket.id) return cb?.({ error: "error.notHost" });
+    if (lobby.players.length < 2) return cb?.({ error: "error.needPlayers" });
 
     lobby.state = "playing";
-    lobby.game = buildGameState(lobby);
+    lobby.game = buildGameState(lobby, difficulty);
     lobby.players.forEach((p) => (p.score = 0));
 
     cb?.({ ok: true });
@@ -381,7 +427,8 @@ io.on("connection", (socket) => {
     if (!lobby || lobby.state !== "playing") return;
 
     const game = lobby.game;
-    if (currentPlayerId(game) !== socket.id) return; // Not your turn
+    if (game.isCheckingAnswer) return; // Wait for LLM
+    if (currentPlayerId(game) !== socket.id) return;
     if (game.phase === "reveal" || game.phase === "gameEnd") return;
 
     handleTurnEnd(lobby, answer);
@@ -401,6 +448,27 @@ io.on("connection", (socket) => {
     io.emit("lobbies:update", getPublicLobbies());
   });
 
+  socket.on("lobby:leave", () => {
+    if (!currentLobbyCode) return;
+    const lobby = lobbies.get(currentLobbyCode);
+    if (!lobby) return;
+
+    lobby.players = lobby.players.filter((p) => p.id !== socket.id);
+    socket.leave(currentLobbyCode);
+    currentLobbyCode = null;
+
+    if (lobby.players.length === 0) {
+      if (lobby.game) clearTurnTimer(lobby.game);
+      lobbies.delete(lobby.code);
+    } else if (lobby.hostId === socket.id) {
+      lobby.hostId = lobby.players[0].id;
+      io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));
+    } else {
+      io.to(lobby.code).emit("lobby:updated", lobbyInfo(lobby));
+    }
+    io.emit("lobbies:update", getPublicLobbies());
+  });
+
   socket.on("disconnect", () => {
     if (!currentLobbyCode) return;
     const lobby = lobbies.get(currentLobbyCode);
@@ -415,18 +483,15 @@ io.on("connection", (socket) => {
       return;
     }
 
-    // If host left, assign new host
     if (lobby.hostId === socket.id) {
       lobby.hostId = lobby.players[0].id;
     }
 
-    // If game was in progress and it's the disconnected player's turn, advance
     if (lobby.state === "playing" && lobby.game) {
       const game = lobby.game;
       game.turnOrder = game.turnOrder.filter((id) => id !== socket.id);
 
       if (game.turnOrder.length < 2) {
-        // Not enough players to continue
         lobby.state = "finished";
         game.phase = "gameEnd";
         clearTurnTimer(game);
@@ -441,7 +506,6 @@ io.on("connection", (socket) => {
         currentPlayerId(game) === socket.id ||
         !game.turnOrder.includes(currentPlayerId(game))
       ) {
-        // Adjust turn index and restart timer
         game.currentTurnIndex = game.currentTurnIndex % game.turnOrder.length;
         emitGameState(lobby);
         startTurnTimer(lobby);
