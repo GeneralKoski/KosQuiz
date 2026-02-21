@@ -2,7 +2,7 @@ name: Deploy KosQuiz
 
 on:
   push:
-    branches: [ main ] # Si attiva quando fai push su main
+    branches: [main]
 
 jobs:
   deploy:
@@ -15,15 +15,20 @@ jobs:
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # 1. Carica Node, NPM e PM2 nel terminale di GitHub
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            # 2. Entra nella cartella e aggiorna il codice
             cd /srv/apps/quiz-project
             git pull origin main
-            
-            # Backend
+
+            # 3. Aggiorna il Backend
             cd server
             npm install
             pm2 restart kosquiz-backend || pm2 start index.js --name kosquiz-backend
-            
-            # Frontend
+
+            # 4. Aggiorna il Frontend
             cd ../client
             npm install
             npm run build
