@@ -97,7 +97,7 @@ export default function Landing({ onJoinLobby }: LandingProps) {
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 relative">
-      <div className="flex flex-col md:flex-row gap-12 items-center md:items-start pt-4 md:pt-12">
+      <div className="flex flex-col md:flex-row gap-12 items-center md:items-start">
         {/* Colonne di sinistra: Testo e Call to Actions */}
         <div className="flex-1 w-full text-center md:text-left">
           <div className="mb-10">

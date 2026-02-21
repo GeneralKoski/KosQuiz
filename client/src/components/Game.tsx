@@ -1,5 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { CheckCircle2, Lightbulb, Send, Timer, Trophy } from "lucide-react";
+import {
+  CheckCircle2,
+  Lightbulb,
+  Send,
+  Timer,
+  Trophy,
+  Users,
+} from "lucide-react";
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import socket from "../socket";
