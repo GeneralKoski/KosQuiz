@@ -116,33 +116,35 @@ export default function Landing({ onJoinLobby }: LandingProps) {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 mb-8">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={openCreateModal}
+                className="flex-1 bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-black font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all hover:scale-105 cursor-pointer shadow-[0_0_30px_rgba(59,130,246,0.3)] hover:shadow-[0_0_40px_rgba(59,130,246,0.5)]"
+              >
+                <Plus size={24} />
+                <span className="text-lg">{t("landing.createLobby")}</span>
+              </button>
+              <button
+                onClick={() => openJoinModal()}
+                className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all hover:scale-105 cursor-pointer backdrop-blur-sm"
+              >
+                <Search size={24} />
+                <span className="text-lg">{t("landing.joinLobby")}</span>
+              </button>
+            </div>
+
             <button
-              onClick={openCreateModal}
-              className="flex-1 bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-black font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all hover:scale-105 cursor-pointer shadow-[0_0_30px_rgba(59,130,246,0.3)] hover:shadow-[0_0_40px_rgba(59,130,246,0.5)]"
+              onClick={() => {
+                setErrors({});
+                setView("leaderboard");
+              }}
+              className="w-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-500 font-bold py-4 px-8 rounded-2xl flex items-center justify-center gap-2 transition-all hover:scale-[1.02] cursor-pointer"
             >
-              <Plus size={24} />
-              <span className="text-lg">{t("landing.createLobby")}</span>
-            </button>
-            <button
-              onClick={() => openJoinModal()}
-              className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all hover:scale-105 cursor-pointer backdrop-blur-sm"
-            >
-              <Search size={24} />
-              <span className="text-lg">{t("landing.joinLobby")}</span>
+              <Trophy size={24} />
+              <span className="text-lg">{t("landing.leaderboard")}</span>
             </button>
           </div>
-
-          <button
-            onClick={() => {
-              setErrors({});
-              setView("leaderboard");
-            }}
-            className="w-full sm:w-auto bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-500 font-bold py-4 px-8 rounded-2xl flex items-center justify-center gap-2 transition-all hover:scale-105 cursor-pointer"
-          >
-            <Trophy size={24} />
-            <span className="text-lg">{t("landing.leaderboard")}</span>
-          </button>
         </div>
 
         {/* Colonna di destra: Lobbies */}
