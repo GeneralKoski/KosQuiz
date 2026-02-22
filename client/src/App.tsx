@@ -125,15 +125,17 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="relative flex items-center justify-end px-4 py-3 border-b border-white/5">
+      <header className="relative flex items-center justify-between px-8 py-6 border-b border-white/5 bg-[#0b0f19]/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="w-32" />
         <button
           onClick={returnToHome}
-          className="absolute left-1/2 -translate-x-1/2 text-3xl font-black tracking-widest uppercase cursor-pointer text-[var(--accent-color)] hover:text-[var(--accent-hover)] transition-colors"
+          className="text-3xl font-black tracking-widest uppercase cursor-pointer text-[var(--accent-color)] hover:text-[var(--accent-hover)] transition-all hover:scale-105 active:scale-95"
         >
           {t("appName")}
         </button>
-        <LanguageSwitcher />
+        <div className="w-32 flex justify-end">
+          <LanguageSwitcher />
+        </div>
       </header>
 
       {/* Content */}

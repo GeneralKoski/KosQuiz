@@ -2,7 +2,7 @@
   "appName": "KosQuiz",
   "landing": {
     "title": "Welcome to KosQuiz",
-    "subtitle": "Multiplayer quiz game",
+    "subtitle": "Create a lobby or join to play.",
     "namePlaceholder": "Enter your display name",
     "language": "Language",
     "createLobby": "Create Lobby",

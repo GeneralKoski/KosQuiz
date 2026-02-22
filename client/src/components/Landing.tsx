@@ -284,7 +284,7 @@ export default function Landing({ onJoinLobby }: LandingProps) {
                         if (errors.code)
                           setErrors((prev) => ({ ...prev, code: undefined }));
                       }}
-                      placeholder={t("landing.codePlaceholder")}
+                      placeholder="XXXXXX"
                       maxLength={6}
                       className={`w-full bg-[#111] border ${errors.code ? "border-red-500/50 focus:border-red-400 focus:ring-red-400" : "border-white/10 focus:border-[var(--accent-color)] focus:ring-[var(--accent-color)]"} rounded-2xl px-5 py-4 text-[var(--accent-color)] placeholder-white/20 text-xl font-black tracking-[0.3em] focus:outline-none focus:ring-1 transition-all uppercase`}
                     />
