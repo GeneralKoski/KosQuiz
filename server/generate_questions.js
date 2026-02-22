@@ -97,7 +97,6 @@ Important rules:
 5. Provide obscure, unique questions. Avoid common cliches (e.g. NO "Capital of France", NO "Author of Hamlet").
 `;
 
-// Carichiamo tutte le domande già esistenti in modo da NON generare doppioni!
 import Database from "better-sqlite3";
 const db = new Database("kosquiz.db");
 const existingQuestions = new Set(
@@ -120,7 +119,7 @@ async function generateBatch(category) {
           content: PROMPT_TEMPLATE.replace("{category}", category),
         },
       ],
-      model: "llama-3.1-8b-instant", // Modello più piccolo ed economico per i tokens
+      model: "llama-3.1-8b-instant",
       temperature: 0.9,
       max_tokens: 4000,
       response_format: { type: "json_object" },
@@ -138,7 +137,6 @@ async function generateBatch(category) {
 
       const qKey = q.easy.question.en.toString().toLowerCase().trim();
 
-      // Controllo antidoppione basato sulla domanda prima di inserire nel DB!
       if (existingQuestions.has(qKey)) {
         console.log(`⚠️ Skipped duplicate question: "${q.easy.question.en}"`);
         continue;
@@ -154,11 +152,25 @@ async function generateBatch(category) {
     console.log(
       `✅ Successfully inserted ${inserted} new unique questions for ${category}`,
     );
+    return 0;
   } catch (error) {
+    const msg = error.message || String(error);
     console.error(
       `❌ Failed to generate or parse questions for ${category}:`,
-      error.message,
+      msg,
     );
+
+    const match = msg.match(
+      /try again in (?:([0-9]+)h)?(?:([0-9]+)m)?([0-9.]+)s/,
+    );
+    if (match) {
+      const h = parseFloat(match[1] || 0);
+      const m = parseFloat(match[2] || 0);
+      const s = parseFloat(match[3] || 0);
+      const waitMs = Math.ceil((h * 3600 + m * 60 + s) * 1000);
+      return waitMs;
+    }
+    return 0;
   }
 }
 
@@ -169,12 +181,20 @@ async function loop() {
   let i = 0;
   while (true) {
     const cat = CATEGORIES[i % CATEGORIES.length];
-    await generateBatch(cat);
-    i++;
+    const waitTime = await generateBatch(cat);
 
-    // Attendi 5 secondi tra le chiamate
-    console.log("Waiting 5s...");
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    if (waitTime > 0) {
+      const secondsToWait = Math.ceil(waitTime / 1000) + 1;
+      console.log(
+        `\n⏳ RATE LIMIT HIT! Il server incrocia le braccia. Dormo saggiamente per ${secondsToWait} secondi prima di riprovare...`,
+      );
+      await new Promise((resolve) => setTimeout(resolve, secondsToWait * 1000));
+    } else {
+      i++;
+
+      console.log("Waiting 5s...\n");
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
   }
 }
 
